@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "75366675254",
+    "firebase_url": "https://project-delta-db6b3.firebaseio.com",
+    "project_id": "project-delta-db6b3",
+    "storage_bucket": "project-delta-db6b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75366675254:android:83f3845703fe9b59f4f997",
+        "android_client_info": {
+          "package_name": "com.utsavsac.utsav_events"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "75366675254-o5qspr6b82s9a6a5qdefn7mimg9kd8ul.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.utsavsac.utsav_events",
+            "certificate_hash": "515a40e319f3ba0d5d8622f3365c1c235fac4083"
+          }
+        },
+        {
+          "client_id": "75366675254-2s0uvh63p1fsk0o66614srue3cbcbgot.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASpQELn16rjXQ_jhBRnEYCY9lqbtulJzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "75366675254-2s0uvh63p1fsk0o66614srue3cbcbgot.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,237 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:project_delta/http_exception.dart';
+import 'package:http/http.dart' as http;
+import 'package:rxdart/rxdart.dart';
+import 'dart:convert';
+import 'events.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
+class Auth with ChangeNotifier {
+  String _token;
+  DateTime _expiryDate;
+  String _userID;
+  Timer _authTimer;
+  bool otherAuth = false;
+  bool get isAuth {
+    //if (otherAuth == true) { return true;}
+    return token != null;
+  }
+
+  String get token {
+    if (_expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
+  Future<void> signup(String email, String password, String urlSegment) async {
+    final url =
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAfXLxZRkJ-rB00Z9TCrBRdJizZ6AQriH4';
+
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'email': email,
+            'password': password,
+            'returnSecureToken': true
+          }));
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        throw HttpException(responseData['error']['message']);
+      }
+      print(response.body);
+      _token = responseData['idToken'];
+      _userID = responseData['localId'];
+      _expiryDate = DateTime.now()
+          .add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> login(String email, String password, String s) async {
+    final url =
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAfXLxZRkJ-rB00Z9TCrBRdJizZ6AQriH4';
+
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'email': email,
+            'password': password,
+            'returnSecureToken': true
+          }));
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        throw HttpException(responseData['error']['message']);
+      }
+      print(response.body);
+      _token = responseData['idToken'];
+      _userID = responseData['localId'];
+      _expiryDate = DateTime.now()
+          .add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      final userData = json.encode({
+        'token': _token,
+        'userId': _userID,
+        'expiryDate': _expiryDate.toIso8601String(),
+        'email': email
+      });
+      prefs.setString('userData', userData);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<bool> tryAutoLogin(User user) async {
+    String email = '';
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      return false;
+    }
+    final extractedUserData = json.decode(prefs.getString('userData'));
+    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+    _token = extractedUserData['token'];
+    _userID = extractedUserData['userId'];
+    user.email = extractedUserData['email'];
+    _expiryDate = expiryDate;
+    notifyListeners();
+    //_autoLogout();
+    return true;
+  }
+
+  Future<void> logout() async {
+    _token = null;
+    _userID = null;
+    _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    // prefs.remove('userData');
+    prefs.clear();
+    //Phoenix.rebirth(context);
+  }
+  // void _autoLogout() {
+  //   if (_authTimer != null) {
+  //     _authTimer.cancel();
+  //   }
+  //   final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+  //   _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
+  // }
+
+}
+
+class AuthService {
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final Firestore _db = Firestore.instance;
+
+  Observable<FirebaseUser> user; // firebase user
+  Observable<Map<String, dynamic>> profile; // custom user data in Firestore
+  PublishSubject loading = PublishSubject();
+
+  // constructor
+  AuthService() {
+    user = Observable(_auth.onAuthStateChanged);
+
+    profile = user.switchMap((FirebaseUser u) {
+      if (u != null) {
+        return _db
+            .collection('users')
+            .document(u.uid)
+            .snapshots()
+            .map((snap) => snap.data);
+      } else {
+        return Observable.just({});
+      }
+    });
+  }
+
+  Future<FirebaseUser> googleSignIn(
+      User userClass, Auth auth, BuildContext context) async {
+    bool firstSignin;
+
+    try {
+      loading.add(true);
+      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth =
+          await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      AuthResult result = await _auth.signInWithCredential(credential);
+      FirebaseUser user = result.user;
+      updateUserData(user, userClass, auth, firstSignin);
+      print("user name: ${user.displayName}");
+
+      if (firstSignin == true) {
+        Navigator.of(context).pushNamed('/secondstep');
+      } else {
+        Navigator.of(context).pushNamed('/home');
+      }
+
+      loading.add(false);
+      return user;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  void updateUserData(
+      FirebaseUser user, User userClass, Auth auth, bool firstSignin) async {
+    auth.otherAuth = true;
+    userClass.email = user.email;
+    userClass.profilePic = user.photoUrl;
+    userClass.name = user.displayName;
+    DocumentReference ref = _db.collection('users').document(user.email);
+    var document = ref;
+    document.get().then((document) {
+      document = document;
+    });
+
+    if (document == null) {
+      firstSignin = true;
+    } else {
+      firstSignin = false;
+    }
+
+    return ref.setData({
+      'uid': user.uid,
+      'email': user.email,
+      'photoURL': user.photoUrl,
+      'name': user.displayName,
+      'lastSeen': DateTime.now()
+    }, merge: true);
+  }
+
+  Future<String> signOut() async {
+    try {
+      await _auth.signOut();
+      return 'SignOut';
+    } catch (e) {
+      return e.toString();
+    }
+  }
+}
+
+// TODO refactor global to InheritedWidget
+final AuthService authService = AuthService();
