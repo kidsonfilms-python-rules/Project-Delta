@@ -20,8 +20,6 @@ import 'package:project_delta/services/push_notification.dart';
 import 'package:project_delta/volunteer.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:square_in_app_payments/in_app_payments.dart';
-import 'package:square_in_app_payments/models.dart' as credit;
 import 'package:timer_builder/timer_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
 //import 'app_state.dart';
@@ -952,29 +950,29 @@ class _AccountRouteState extends State<AccountRoute> {
   //TODO: Put pay() in the designated page
 
   void _pay() {
-    InAppPayments.setSquareApplicationId('sq0idp-BMmW1tjTRhOTjAa_fSQ2EQ');
-    InAppPayments.startCardEntryFlow(
-      onCardNonceRequestSuccess: _cardNonceRequestSuccess,
-      onCardEntryCancel: _cardEntryCancel,
-    );
+    // InAppPayments.setSquareApplicationId('sq0idp-BMmW1tjTRhOTjAa_fSQ2EQ');
+    // InAppPayments.startCardEntryFlow(
+    //   onCardNonceRequestSuccess: _cardNonceRequestSuccess,
+    //   onCardEntryCancel: _cardEntryCancel,
+    // );
   }
 
-  void _cardEntryCancel() {}
+  // void _cardEntryCancel() {}
 
-  void _cardNonceRequestSuccess(credit.CardDetails result) {
-    print('\n\n\nSuccess');
-    print(result.nonce);
-    //print(result.card);
-    print('\n\n\n');
+  // void _cardNonceRequestSuccess(credit.CardDetails result) {
+  //   print('\n\n\nSuccess');
+  //   print(result.nonce);
+  //   //print(result.card);
+  //   print('\n\n\n');
 
-    InAppPayments.completeCardEntry(
-      onCardEntryComplete: _onCardEntryComplete,
-    );
-  }
+  //   InAppPayments.completeCardEntry(
+  //     onCardEntryComplete: _onCardEntryComplete,
+  //   );
+  // }
 
-  void _onCardEntryComplete() {
-    print("success!!!!");
-  }
+  // void _onCardEntryComplete() {
+  //   print("success!!!!");
+  // }
 
   Future<void> _changeUtsavId(BuildContext context) {
     String newUtsavId = '';
@@ -1275,7 +1273,9 @@ class _AccountRouteState extends State<AccountRoute> {
                                                       child: ListBody(
                                                         children: <Widget>[
                                                           Text(
-                                                              'Do you really want to change your password for your ' + email + ' account?'),
+                                                              'Do you really want to change your password for your ' +
+                                                                  email +
+                                                                  ' account?'),
                                                           // Image.network(
                                                           //     'https://media2.giphy.com/media/LAKIIRqtM1dqE/giphy.gif'),
                                                         ],
@@ -1301,11 +1301,14 @@ class _AccountRouteState extends State<AccountRoute> {
                                                         onPressed: () {
                                                           http.post(
                                                               'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyAfXLxZRkJ-rB00Z9TCrBRdJizZ6AQriH4',
-                                                              body: json.encode({
-                                                                "requestType": "PASSWORD_RESET",
+                                                              body: json
+                                                                  .encode({
+                                                                "requestType":
+                                                                    "PASSWORD_RESET",
                                                                 "email": email
                                                               }));
-                                                              Navigator.of(context).pop();
+                                                          Navigator.of(context)
+                                                              .pop();
                                                         },
                                                       )
                                                     ],
@@ -1471,9 +1474,7 @@ class _AccountRouteState extends State<AccountRoute> {
                                           OutlineButton(
                                             child: Text('Take My Money!!!'),
                                             // onPressed: _pay,
-                                            onPressed: () {
-                                              
-                                            },
+                                            onPressed: () {},
                                           )
                                         ])),
                                   );

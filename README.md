@@ -1,4 +1,4 @@
-# project_delta
+# Project Delta
 
 A new Flutter project.
 
