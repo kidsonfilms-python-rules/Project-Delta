@@ -1,16 +1,40 @@
-# Project Delta
+# Project Delta (Public Name: Utsav Events)
 
-A new Flutter project.
+This is an app developed by [KidsonX Tech](https://github.com/kidsonfilms-python-rules/) for [Utsav Inc](https://utsavsac.org/) and their customers. This project may be retrofitted for other organizations as well.
 
-## Getting Started
+## Table of Contents
 
-This project is a starting point for a Flutter application.
+- [Installation](#installation)
+- [Usage](#usage)
+- [Support](#support)
+- [Contributing](#contributing)
 
-A few resources to get you started if this is your first Flutter project:
+## Installation
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Download this Project by using Git:
+```sh
+git clone https://github.com/kidsonfilms-python-rules/Project-Delta
+```
+Or by clicking [here](https://github.com/kidsonfilms-python-rules/Project-Delta/archive/master.zip)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Usage
+
+Replace the contents of `README.md` with your project's:
+
+- Name
+- Description
+- Installation instructions
+- Usage instructions
+- Support instructions
+- Contributing instructions
+- Licence
+
+Feel free to remove any sections that aren't applicable to your project.
+
+## Support
+
+Please [open an issue](https://github.com/fraction/readme-boilerplate/issues/new) for support.
+
+## Contributing
+
+Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/fraction/readme-boilerplate/compare/).
