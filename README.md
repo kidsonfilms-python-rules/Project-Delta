@@ -17,24 +17,34 @@ git clone https://github.com/kidsonfilms-python-rules/Project-Delta
 ```
 Or by clicking [here](https://github.com/kidsonfilms-python-rules/Project-Delta/archive/master.zip)
 
+Also Install Flutter. [Here are the steps.](https://flutter.dev/docs/get-started/install)
+
 ## Usage
+Just run:
+```sh
+flutter run
+```
+in the root directory
 
-Replace the contents of `README.md` with your project's:
+With Verbose Command
+```sh
+flutter run -v
+```
 
-- Name
-- Description
-- Installation instructions
-- Usage instructions
-- Support instructions
-- Contributing instructions
-- Licence
+And to build the app for production:
+```sh
+flutter build
+```
+or for iOS
+```sh
+flutter build ios
+```
 
-Feel free to remove any sections that aren't applicable to your project.
 
 ## Support
 
-Please [open an issue](https://github.com/fraction/readme-boilerplate/issues/new) for support.
+Please [open an issue](https://github.com/kidsonfilms-python-rules/Project-Delta/issues/new) for support.
 
 ## Contributing
 
-Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/fraction/readme-boilerplate/compare/).
+We are currently not accepting contributions outside of our Dev Team. If you have an idea, you still can open a [Pull Request Here](https://github.com/kidsonfilms-python-rules/Project-Delta/compare)
