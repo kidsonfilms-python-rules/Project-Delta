@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'dart:io';
+import 'dart:io' show Platform;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable/expandable.dart';
@@ -470,7 +470,8 @@ class _HomePageState extends State<HomePage> {
                                             Container(
                                               margin: EdgeInsets.all(10),
                                               child: Text(
-                                                'Click below for your check-in tickets',
+                                                //'Click below for your check-in tickets',
+                                                'Check-in not needed for virtual events', //jray
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                   fontSize: 14,
@@ -488,10 +489,12 @@ class _HomePageState extends State<HomePage> {
                                                             .secondaryColor)),
                                                 elevation: 10,
                                                 disabledColor: Colors.grey,
-                                                onPressed: () {
-                                                  Navigator.pushNamed(
-                                                      context, '/lunchcheckin');
-                                                },
+                                                // jray: disabled the button for DP2020
+                                                // onPressed: () {
+                                                //   Navigator.pushNamed(
+                                                //       context, '/lunchcheckin');
+                                                // },
+                                                onPressed: null,
                                               ),
                                             ),
                                           ],
@@ -957,6 +960,18 @@ class _AccountRouteState extends State<AccountRoute> {
     // );
   }
 
+  Future<void> _launchInApp(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceWebView: false,
+        forceSafariVC: false,
+      );
+    } else {
+      throw 'Could not go to $url';
+    }
+  }
+
   // void _cardEntryCancel() {}
 
   // void _cardNonceRequestSuccess(credit.CardDetails result) {
@@ -1384,7 +1399,7 @@ class _AccountRouteState extends State<AccountRoute> {
                                           ),
                                           Divider(),
                                           Text(
-                                            'My Memeberships',
+                                            'My Memberships',
                                             style: TextStyle(fontSize: 18),
                                             textAlign: TextAlign.start,
                                           ),
@@ -1400,6 +1415,19 @@ class _AccountRouteState extends State<AccountRoute> {
                                                         FontWeight.bold),
                                                 textAlign: TextAlign.start,
                                               )),
+                                              Divider(),
+                                          OutlineButton(
+                                            child: Text('Buy Membership'),
+                                            // onPressed: _pay,
+                                            onPressed: () {
+                                              if (Platform.isAndroid) {
+                                                _launchInApp('https://www.utsavsac.org/membership');
+                                              } else if (Platform.isIOS) {
+                                                var snakbar = SnackBar(content: Text('This is Not Supported on iOS'));
+                                                Scaffold.of(context).showSnackBar(snakbar);
+                                              }
+                                            },
+                                          ),
                                           Divider(),
                                           OutlineButton(
                                             // onPressed: () {
@@ -1471,11 +1499,6 @@ class _AccountRouteState extends State<AccountRoute> {
                                                         100.0)),
                                             highlightedBorderColor: Colors.red,
                                           ),
-                                          OutlineButton(
-                                            child: Text('Take My Money!!!'),
-                                            // onPressed: _pay,
-                                            onPressed: () {},
-                                          )
                                         ])),
                                   );
                                 }))
