@@ -292,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(children: <Widget>[
                             Text(
-                              'Alpha 0.1.1',
+                              'Beta 0.1.0',
                               textAlign: TextAlign.start,
                               style: TextStyle(color: Colors.grey),
                             ),
@@ -2514,78 +2514,78 @@ Widget _myFSListView(BuildContext context) {
                   ));
 
             List<Events> myEventList = [];
+            //for (int i = 0; i < snapshot.data.documents.length; i++) {
+            // List<Events> myEventList = [];
             for (int i = 0; i < snapshot.data.documents.length; i++) {
-              List<Events> myEventList = [];
-              for (int i = 0; i < snapshot.data.documents.length; i++) {
-                Events _event = Events(
-                  snapshot.data.documents[i]['name'],
-                  DateTime.parse(snapshot.data.documents[i]['time']),
-                  snapshot.data.documents[i]['index'],
-                  snapshot.data.documents[i]['delay'],
-                  snapshot.data.documents[i]['body'],
-                  snapshot.data.documents[i]['imageUrl'],
-                );
+              Events _event = Events(
+                snapshot.data.documents[i]['name'],
+                DateTime.parse(snapshot.data.documents[i]['time']),
+                snapshot.data.documents[i]['index'],
+                snapshot.data.documents[i]['delay'],
+                snapshot.data.documents[i]['body'],
+                snapshot.data.documents[i]['imageUrl'],
+              );
 
-                myEventList.add(_event);
-              }
+              myEventList.add(_event);
+            }
 
-              myEventList.sort((a, b) => a.time.compareTo(b.time));
-              //snapshot.data.documents.sort((a, b) => (a['index'] - b['indsex'])); //sort the items based on "index"
-              //print('im here');
-              //print("first name is = " + myEventList[0].name);
+            myEventList.sort((a, b) => a.time.compareTo(b.time));
+            //snapshot.data.documents.sort((a, b) => (a['index'] - b['indsex'])); //sort the items based on "index"
+            //print('im here');
+            //print("first name is = " + myEventList[0].name);
 
-              return Container(
-                  height: 555,
-                  child: ListView.builder(
-                    itemCount: snapshot.data.documents.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              new MaterialPageRoute(
-                                  builder: (context) =>
-                                      SchedulePage(myEventList[index])));
-                        },
-                        child: Card(
-                          margin: const EdgeInsets.symmetric(vertical: 12),
-                          elevation: 4,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(24))),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              children: <Widget>[
-                                Container(
-                                  width: 200,
-                                  child: Text(myEventList[index].name,
-                                      overflow: TextOverflow.ellipsis,
-                                      textWidthBasis: TextWidthBasis.parent,
-                                      style: TextStyle(
-                                          color: Colors.deepPurple,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                                SizedBox(
-                                  width: 15,
-                                ),
-                                Text(
-                                  DateFormat('E hh:mm a')
-                                      .format(myEventList[index].time)
-                                      .toString(),
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              ],
-                            ),
+            return Container(
+                height: 555,
+                child: ListView.builder(
+                  itemCount: snapshot.data.documents.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            new MaterialPageRoute(
+                                builder: (context) =>
+                                    SchedulePage(myEventList[index])));
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                        elevation: 4,
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(24))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: 200,
+                                child: Text(myEventList[index].name,
+                                    overflow: TextOverflow.ellipsis,
+                                    textWidthBasis: TextWidthBasis.parent,
+                                    style: TextStyle(
+                                        color: Colors.deepPurple,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Text(
+                                DateFormat('E hh:mm a')
+                                    .format(myEventList[index].time)
+                                    .toString(),
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
                           ),
                         ),
-                      );
-                    },
-                  ));
+                      ),
+                    );
+                  },
+                ));
 
-              /*ListView.builder(
+            /*ListView.builder(
                 itemCount: snapshot.data.length,
                 itemBuilder: (ctx, index) {
                   return Card(
@@ -2611,7 +2611,6 @@ Widget _myFSListView(BuildContext context) {
                         ),
                       ));
                 },),*/
-            }
           }));
 
   //return
