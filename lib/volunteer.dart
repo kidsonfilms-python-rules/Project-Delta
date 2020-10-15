@@ -27,13 +27,14 @@ class Message {
   final bool unread;
   final String multimedia;
 
-  Message( 
-      {this.sender,
-      this.time,
-      this.text,
-      this.isLiked,
-      this.unread,
-      this.multimedia,});
+  Message({
+    this.sender,
+    this.time,
+    this.text,
+    this.isLiked,
+    this.unread,
+    this.multimedia,
+  });
 }
 
 // YOU - current user
@@ -102,7 +103,7 @@ class VolunteerRoute extends StatelessWidget {
           primaryColor: Color(0xFFc1451c),
           primaryColorLight: Color(0xFFfa7548),
           primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: secondaryColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
             drawer: Drawer(
@@ -150,10 +151,10 @@ class VolunteerRoute extends StatelessWidget {
                   ListTile(
                       title: Text(
                         'Volunteer',
-                        style: TextStyle(color: primaryDarkColor),
+                        style: TextStyle(color: color.primaryDarkColor),
                       ),
                       onTap: () {}),
-                      ListTile(
+                  ListTile(
                     title: Text('About'),
                     onTap: () {
                       Navigator.of(context).pushReplacementNamed('/about');
@@ -164,7 +165,7 @@ class VolunteerRoute extends StatelessWidget {
             ),
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: primaryColor,
+              backgroundColor: color.primaryColor,
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
@@ -254,9 +255,9 @@ class VolunteerRoute extends StatelessWidget {
                                           child: Text(
                                             'Done',
                                             style: TextStyle(
-                                                color: secondaryColor),
+                                                color: color.secondaryColor),
                                           ),
-                                          color: primaryColor,
+                                          color: color.primaryColor,
                                           onPressed: () {
                                             if (submittedAccessPin == 666666) {
                                               Navigator.of(context)
@@ -285,7 +286,7 @@ class _CategorySelectorState extends State<CategorySelector> {
     // TODO: implement build
     return Container(
       height: 90,
-      color: primaryColor,
+      color: color.primaryColor,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: categories.length,
@@ -303,7 +304,7 @@ class _CategorySelectorState extends State<CategorySelector> {
                   categories[index],
                   style: TextStyle(
                       color: index == selectedIndex
-                          ? secondaryColor
+                          ? color.secondaryColor
                           : Colors.white60,
                       fontSize: 22.0,
                       fontWeight: FontWeight.bold,
@@ -492,7 +493,7 @@ class RecentChats extends StatelessWidget {
                                     decoration: BoxDecoration(
                                         borderRadius:
                                             BorderRadius.circular(30.0),
-                                        color: primaryLightColor),
+                                        color: color.primaryLightColor),
                                     alignment: Alignment.center,
                                     child: Text(
                                       'NEW',
@@ -529,10 +530,10 @@ class VolunteerChatRoute extends StatelessWidget {
           primaryColor: Color(0xFFc1451c),
           primaryColorLight: Color(0xFFfa7548),
           primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: secondaryColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
-          backgroundColor: primaryColor,
+          backgroundColor: color.primaryColor,
           drawer: Drawer(
             child: ListView(
               // Important: Remove any padding from the ListView.
@@ -578,15 +579,15 @@ class VolunteerChatRoute extends StatelessWidget {
                 ListTile(
                     title: Text(
                       'Volunteer',
-                      style: TextStyle(color: primaryDarkColor),
+                      style: TextStyle(color: color.primaryDarkColor),
                     ),
                     onTap: () {}),
-                    ListTile(
-                    title: Text('About'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/about');
-                    },
-                  ),
+                ListTile(
+                  title: Text('About'),
+                  onTap: () {
+                    Navigator.of(context).pushReplacementNamed('/about');
+                  },
+                ),
               ],
             ),
           ),
@@ -595,7 +596,7 @@ class VolunteerChatRoute extends StatelessWidget {
                 IconButton(icon: const Icon(Icons.search), onPressed: () {})
               ],
               elevation: 0.0,
-              backgroundColor: primaryColor,
+              backgroundColor: color.primaryColor,
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
@@ -643,7 +644,6 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  
   _buildMessage(Message message, bool isMe) {
     final Container msg = Container(
       margin: isMe
@@ -713,7 +713,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-   _buildMessageComposer() {
+  _buildMessageComposer() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       height: 70.0,
@@ -738,7 +738,7 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
             icon: Icon(Icons.send),
             iconSize: 25.0,
-            color: primaryColor,
+            color: color.primaryColor,
             onPressed: () {},
           ),
         ],
@@ -746,12 +746,11 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: color.primaryColor,
       appBar: AppBar(
         elevation: 0.0,
         title: Text(
@@ -780,7 +779,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     topLeft: Radius.circular(30.0),
                     topRight: Radius.circular(30.0)),
                 child: ListView.builder(
-                  padding: EdgeInsets.only(top: 15.0),
+                    padding: EdgeInsets.only(top: 15.0),
                     itemCount: messages.length,
                     itemBuilder: (BuildContext context, int index) {
                       final Message message = messages[index];

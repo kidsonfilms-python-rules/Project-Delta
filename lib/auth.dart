@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as f;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in/google_sign_in.dart' as g;
 import 'package:project_delta/http_exception.dart';
 import 'package:http/http.dart' as http;
 import 'package:rxdart/rxdart.dart';
@@ -138,48 +138,48 @@ class Auth with ChangeNotifier {
 }
 
 class AuthService {
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final Firestore _db = Firestore.instance;
+  final g.GoogleSignIn _googleSignIn = g.GoogleSignIn();
+  final f.FirebaseAuth _auth = f.FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Observable<FirebaseUser> user; // firebase user
+  Observable<f.User> user; // firebase user
   Observable<Map<String, dynamic>> profile; // custom user data in Firestore
   PublishSubject loading = PublishSubject();
 
   // constructor
   AuthService() {
-    user = Observable(_auth.onAuthStateChanged);
+    user = Observable(_auth.authStateChanges());
 
-    profile = user.switchMap((FirebaseUser u) {
+    profile = user.switchMap((f.User u) {
       if (u != null) {
         return _db
             .collection('users')
-            .document(u.uid)
+            .doc(u.uid)
             .snapshots()
-            .map((snap) => snap.data);
+            .map((snap) => snap.data());
       } else {
         return Observable.just({});
       }
     });
   }
 
-  Future<FirebaseUser> googleSignIn(
+  Future<f.User> googleSignIn(
       User userClass, Auth auth, BuildContext context) async {
     bool firstSignin;
 
     try {
       loading.add(true);
-      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
-      GoogleSignInAuthentication googleAuth =
+      g.GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      g.GoogleSignInAuthentication googleAuth =
           await googleSignInAccount.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
+      final f.AuthCredential credential = f.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      AuthResult result = await _auth.signInWithCredential(credential);
-      FirebaseUser user = result.user;
+      f.UserCredential result = await _auth.signInWithCredential(credential);
+      f.User user = result.user;
       updateUserData(user, userClass, auth, firstSignin);
       print("user name: ${user.displayName}");
 
@@ -197,12 +197,12 @@ class AuthService {
   }
 
   void updateUserData(
-      FirebaseUser user, User userClass, Auth auth, bool firstSignin) async {
+      f.User user, User userClass, Auth auth, bool firstSignin) async {
     auth.otherAuth = true;
     userClass.email = user.email;
-    userClass.profilePic = user.photoUrl;
+    userClass.profilePic = user.photoURL;
     userClass.name = user.displayName;
-    DocumentReference ref = _db.collection('users').document(user.email);
+    DocumentReference ref = _db.collection('users').doc(user.email);
     var document = ref;
     document.get().then((document) {
       document = document;
@@ -214,13 +214,13 @@ class AuthService {
       firstSignin = false;
     }
 
-    return ref.setData({
+    return ref.set({
       'uid': user.uid,
       'email': user.email,
-      'photoURL': user.photoUrl,
+      'photoURL': user.photoURL,
       'name': user.displayName,
       'lastSeen': DateTime.now()
-    }, merge: true);
+    });
   }
 
   Future<String> signOut() async {

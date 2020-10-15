@@ -22,6 +22,7 @@ class AuthScreen extends StatelessWidget {
     final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
     transformConfig.translate(-10.0);
     return Scaffold(
+        backgroundColor: color.secondaryColor,
         resizeToAvoidBottomInset: false,
         body: AuthCard(user,
             auth) /*Stack(
@@ -150,7 +151,7 @@ class _AuthCardState extends State<AuthCard> {
               content: Text(message),
               actions: <Widget>[
                 FlatButton(
-                  color: primaryColor,
+                  color: color.primaryColor,
                   child: Text('OK'),
                   onPressed: () {
                     Navigator.of(ctx).pop();
@@ -317,7 +318,7 @@ class _AuthCardState extends State<AuthCard> {
   Widget build(BuildContext context) {
     //final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: color.secondaryColor,
         body: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             child: Padding(
@@ -326,7 +327,7 @@ class _AuthCardState extends State<AuthCard> {
                   Text(
                     'Welcome \n back.',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: color.secondaryTextColor,
                       fontSize: 45,
                       fontWeight: FontWeight.w200,
                     ),
@@ -353,6 +354,7 @@ class _AuthCardState extends State<AuthCard> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 40, vertical: 10),
                           child: TextFormField(
+                            style: TextStyle(color: color.secondaryTextColor),
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value.isEmpty || !value.contains('@')) {
@@ -366,25 +368,25 @@ class _AuthCardState extends State<AuthCard> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide(
-                                  color: primaryLightColor,
+                                  color: color.primaryLightColor,
                                   width: 2.5,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide(
-                                  color: primaryColor,
+                                  color: color.primaryColor,
                                   width: 2.5,
                                 ),
                               ),
                               labelText: 'enter e-mail',
                               labelStyle: TextStyle(
-                                color: primaryColor,
+                                color: color.primaryColor,
                                 fontWeight: FontWeight.w300,
                               ),
                               prefixIcon: Icon(
                                 Icons.person_outline,
-                                color: primaryColor,
+                                color: color.primaryColor,
                               ),
                             ),
                           ),
@@ -394,6 +396,7 @@ class _AuthCardState extends State<AuthCard> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 40, vertical: 10),
                           child: TextFormField(
+                            style: TextStyle(color: color.secondaryTextColor),
                             //decoration: InputDecoration(labelText: 'Password'),
                             obscureText: true,
                             controller: _passwordController,
@@ -409,25 +412,25 @@ class _AuthCardState extends State<AuthCard> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide(
-                                  color: primaryLightColor,
+                                  color: color.primaryLightColor,
                                   width: 2.5,
                                 ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
                                 borderSide: BorderSide(
-                                  color: primaryColor,
+                                  color: color.primaryColor,
                                   width: 2.5,
                                 ),
                               ),
                               labelText: 'enter password',
                               labelStyle: TextStyle(
-                                color: primaryColor,
+                                color: color.primaryColor,
                                 fontWeight: FontWeight.w300,
                               ),
                               prefixIcon: Icon(
                                 Icons.lock_outline,
-                                color: primaryColor,
+                                color: color.primaryColor,
                               ),
                             ),
                           ),
@@ -437,6 +440,7 @@ class _AuthCardState extends State<AuthCard> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 40, vertical: 10),
                             child: TextFormField(
+                              style: TextStyle(color: Colors.white),
                               enabled: _authMode == AuthMode.Signup,
                               //decoration: InputDecoration(labelText: 'Confirm Password'),
                               obscureText: true,
@@ -462,14 +466,14 @@ class _AuthCardState extends State<AuthCard> {
                                     width: 2.5,
                                   ),
                                 ),
-                                labelText: 'enter password',
+                                labelText: 'confirm password',
                                 labelStyle: TextStyle(
-                                  color: primaryColor,
+                                  color: color.primaryColor,
                                   fontWeight: FontWeight.w300,
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
-                                  color: Theme.of(context).primaryColor,
+                                  color: color.primaryColor,
                                 ),
                               ),
                             ),
@@ -479,9 +483,9 @@ class _AuthCardState extends State<AuthCard> {
                         ),
                         if (_isLoading)
                           CircularProgressIndicator(
-                            backgroundColor: primaryDarkColor,
+                            backgroundColor: color.primaryDarkColor,
                             valueColor: new AlwaysStoppedAnimation<Color>(
-                                primaryLightColor),
+                                color.primaryLightColor),
                           )
                         else
                           Container(
@@ -490,7 +494,7 @@ class _AuthCardState extends State<AuthCard> {
                             height: 55,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: primaryColor,
+                              color: color.primaryColor,
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: FlatButton(
@@ -530,7 +534,7 @@ class _AuthCardState extends State<AuthCard> {
                           child: Text(
                             '- or -',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: color.secondaryTextColor,
                               fontSize: 20,
                               fontWeight: FontWeight.w200,
                             ),
@@ -541,21 +545,20 @@ class _AuthCardState extends State<AuthCard> {
                           children: <Widget>[
                             if (_isGoogleLoading)
                               Container(
-                                margin: EdgeInsets.only(right: 30, top: 15),
-                                
-                                child: 
-                              CircularProgressIndicator(
-                                backgroundColor: primaryDarkColor,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                    primaryLightColor),
-                              ))
+                                  margin: EdgeInsets.only(right: 30, top: 15),
+                                  child: CircularProgressIndicator(
+                                    backgroundColor: color.primaryDarkColor,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                            color.primaryLightColor),
+                                  ))
                             else
                               Container(
                                 margin: EdgeInsets.only(right: 30, top: 15),
                                 height: 55,
                                 width: 55,
                                 decoration: BoxDecoration(
-                                  color: primaryColor,
+                                  color: color.primaryColor,
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 child: FlatButton(
@@ -585,7 +588,7 @@ class _AuthCardState extends State<AuthCard> {
                               height: 55,
                               width: 55,
                               decoration: BoxDecoration(
-                                color: primaryColor,
+                                color: color.primaryColor,
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: FlatButton(
@@ -609,7 +612,7 @@ class _AuthCardState extends State<AuthCard> {
                           height: 55,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: primaryColor,
+                            color: color.primaryColor,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: FlatButton(

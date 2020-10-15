@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable/expandable.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:intl/intl.dart';
 import 'package:project_delta/aboutPage.dart';
-import 'package:project_delta/colortheme.dart' as prefix0;
+import 'package:project_delta/colortheme.dart';
 import 'package:project_delta/next_event.dart';
 import 'package:project_delta/notification_2.0.dart';
 import 'package:project_delta/schedule_items.dart';
@@ -38,8 +39,10 @@ import 'package:flare_splash_screen/flare_splash_screen.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
   setupLocator();
-  Crashlytics.instance.enableInDevMode = true;
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
 
   final PushNotificationService _pushNotificationService =
       locator<PushNotificationService>();
@@ -52,14 +55,15 @@ main() async {
     print('We ARE FINALLY BLOOOODY SUBSRIBED');
   });
   // Pass all uncaught errors from the framework to Crashlytics.
-  FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   runApp(MaterialApp(
-      home: SplashScreen(
-    'assets/splash.flr',
-    Phoenix(child: MyApp()),
-    startAnimation: 'Untitled',
-    backgroundColor: Color(0xffE8E8E8),
-  )));
+      //     home: SplashScreen(
+      //   'assets/splash.flr',
+      //   MyApp(),
+      //   startAnimation: 'Untitled',
+      //   backgroundColor: Color(0xffE8E8E8),
+      // )));
+      home: Phoenix(child: MyApp())));
 }
 
 class MyApp extends StatelessWidget {
@@ -87,7 +91,9 @@ class MyApp extends StatelessWidget {
           ),
           //ChangeNotifierProvider.value(value: SubmitExtraDetails(this.auth.token),),
           ChangeNotifierProxyProvider<Auth, AccountRoute>(
-            builder: (ctx, auth, previousAccountRoute) => AccountRoute(
+            create: (_) => AccountRoute(auth.token, thisUser.email, authService,
+                thisUser.profilePic, thisUser.name),
+            update: (ctx, auth, previousAccountRoute) => AccountRoute(
                 auth.token,
                 thisUser.email,
                 authService,
@@ -95,7 +101,8 @@ class MyApp extends StatelessWidget {
                 thisUser.name),
           ),
           ChangeNotifierProxyProvider<Auth, SignupStep2>(
-            builder: (ctx, auth, previousSignupStep2) =>
+            create: (_) => SignupStep2(auth.token, thisUser),
+            update: (ctx, auth, previousSignupStep2) =>
                 SignupStep2(auth.token, thisUser),
           ),
         ],
@@ -172,74 +179,94 @@ class _HomePageState extends State<HomePage> {
   build(context) {
     return MaterialApp(
         theme: new ThemeData(
-          primaryColor: primaryColor,
-          primaryColorDark: primaryDarkColor,
-          primaryColorLight: primaryLightColor,
-          secondaryHeaderColor: secondaryColor,
-        ),
+            primaryColor: color.primaryColor,
+            primaryColorDark: color.primaryDarkColor,
+            primaryColorLight: color.primaryLightColor,
+            secondaryHeaderColor: color.secondaryColor,
+            backgroundColor: color.secondaryColor),
         home: Scaffold(
+            backgroundColor: color.secondaryColor,
             drawer: Drawer(
-              child: ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(name),
-                    accountEmail: Text(email),
-                    currentAccountPicture: CircleAvatar(
-                      // child: Text(
-                      //   'B',
-                      //   style: TextStyle(fontSize: 40.0),
-                      // ),
-                      // backgroundColor: primaryDarkColor,
-                      // foregroundColor: Colors.white,
-                      backgroundImage: NetworkImage(profilePic),
+              child: Container(
+                color: color.secondaryLightColor,
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+
+                  children: <Widget>[
+                    UserAccountsDrawerHeader(
+                      accountName: Text(name),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        // child: Text(
+                        //   'B',
+                        //   style: TextStyle(fontSize: 40.0),
+                        // ),
+                        // backgroundColor: primaryDarkColor,
+                        // foregroundColor: Colors.white,
+                        backgroundImage: NetworkImage(profilePic),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Home',
-                      style: TextStyle(color: primaryDarkColor),
+                    ListTile(
+                      title: Text(
+                        'Home',
+                        style: TextStyle(color: color.primaryDarkColor),
+                      ),
+                      onTap: () {},
                     ),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    title: Text('Schedule'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/schedule');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('My Account'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/account');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Contact Us'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/contact');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Settings'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/settings');
-                    },
-                  ),
-                  // ListTile(
-                  //   title: Text('Volunteer'),
-                  //   onTap: () {
-                  //     Navigator.of(context).pushReplacementNamed('/volunteer');
-                  //   },
-                  // ),
-                  ListTile(
-                    title: Text('About'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/about');
-                    },
-                  ),
-                ],
+                    ListTile(
+                      title: Text(
+                        'Schedule',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/schedule');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'My Account',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/account');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Contact Us',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/contact');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Settings',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/settings');
+                      },
+                    ),
+                    // ListTile(
+                    //   title: Text('Volunteer'),
+                    //   onTap: () {
+                    //     Navigator.of(context).pushReplacementNamed('/volunteer');
+                    //   },
+                    // ),
+                    ListTile(
+                      title: Text(
+                        'About',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/about');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             appBar: AppBar(
@@ -308,7 +335,7 @@ class _HomePageState extends State<HomePage> {
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 20),
                                       elevation: 4,
-                                      color: Colors.white,
+                                      color: color.secondaryLightColor,
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(24))),
@@ -316,7 +343,7 @@ class _HomePageState extends State<HomePage> {
                                         Duration(minutes: 5),
                                         builder: (context) {
                                           return StreamBuilder(
-                                              stream: Firestore.instance
+                                              stream: FirebaseFirestore.instance
                                                   .collection('Schedule')
                                                   .snapshots(),
                                               builder: (context, snapshot) {
@@ -327,12 +354,13 @@ class _HomePageState extends State<HomePage> {
                                                           EdgeInsets.all(20),
                                                       child:
                                                           CircularProgressIndicator(
-                                                        backgroundColor:
-                                                            primaryDarkColor,
+                                                        backgroundColor: color
+                                                            .primaryDarkColor,
                                                         valueColor:
                                                             new AlwaysStoppedAnimation<
                                                                     Color>(
-                                                                primaryLightColor),
+                                                                color
+                                                                    .primaryLightColor),
                                                       ));
 
                                                 // go through the schedule and find the current event name
@@ -400,6 +428,8 @@ class _HomePageState extends State<HomePage> {
                                                         'Now',
                                                         style: TextStyle(
                                                           fontSize: 18,
+                                                          color: color
+                                                              .secondaryTextColor,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                         ),
@@ -412,6 +442,8 @@ class _HomePageState extends State<HomePage> {
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
+                                                            color: color
+                                                                .secondaryTextColor,
                                                             fontSize: 21,
                                                           ),
                                                         ),
@@ -422,6 +454,8 @@ class _HomePageState extends State<HomePage> {
                                                             TextAlign.center,
                                                         style: TextStyle(
                                                           fontSize: 18,
+                                                          color: color
+                                                              .secondaryTextColor,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                         ),
@@ -434,6 +468,8 @@ class _HomePageState extends State<HomePage> {
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
+                                                            color: color
+                                                                .secondaryTextColor,
                                                             fontSize: 21,
                                                           ),
                                                         ),
@@ -452,7 +488,7 @@ class _HomePageState extends State<HomePage> {
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 20),
                                       elevation: 4,
-                                      color: Colors.white,
+                                      color: color.secondaryLightColor,
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(24))),
@@ -465,6 +501,7 @@ class _HomePageState extends State<HomePage> {
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
+                                                color: color.secondaryTextColor,
                                               ),
                                             ),
                                             Container(
@@ -475,17 +512,19 @@ class _HomePageState extends State<HomePage> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                   fontSize: 14,
+                                                  color:
+                                                      color.secondaryTextColor,
                                                 ),
                                               ),
                                             ),
                                             Container(
                                               margin: EdgeInsets.all(10),
                                               child: RaisedButton(
-                                                color: primaryColor,
+                                                color: color.primaryColor,
                                                 child: Text('Check-In',
                                                     style: TextStyle(
                                                         fontSize: 20,
-                                                        color: prefix0
+                                                        color: color
                                                             .secondaryColor)),
                                                 elevation: 10,
                                                 disabledColor: Colors.grey,
@@ -508,7 +547,7 @@ class _HomePageState extends State<HomePage> {
                                         margin: const EdgeInsets.symmetric(
                                             vertical: 20),
                                         elevation: 4,
-                                        color: Colors.white,
+                                        color: color.secondaryLightColor,
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(24))),
@@ -519,6 +558,8 @@ class _HomePageState extends State<HomePage> {
                                                 'Announcements',
                                                 style: TextStyle(
                                                   fontSize: 18,
+                                                  color:
+                                                      color.secondaryTextColor,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -526,7 +567,8 @@ class _HomePageState extends State<HomePage> {
                                                 Duration(minutes: 5),
                                                 builder: (context) {
                                                   return StreamBuilder(
-                                                      stream: Firestore.instance
+                                                      stream: FirebaseFirestore
+                                                          .instance
                                                           .collection(
                                                               'Announcements')
                                                           .snapshots(),
@@ -541,11 +583,13 @@ class _HomePageState extends State<HomePage> {
                                                               child:
                                                                   CircularProgressIndicator(
                                                                 backgroundColor:
-                                                                    primaryDarkColor,
+                                                                    color
+                                                                        .primaryDarkColor,
                                                                 valueColor:
                                                                     new AlwaysStoppedAnimation<
                                                                             Color>(
-                                                                        primaryLightColor),
+                                                                        color
+                                                                            .primaryLightColor),
                                                               ));
                                                         int currentIndex =
                                                             snapshot
@@ -677,6 +721,9 @@ class _HomePageState extends State<HomePage> {
                                                                       collapsed:
                                                                           Text(
                                                                         currentBody,
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                color.secondaryTextColor),
                                                                         softWrap:
                                                                             true,
                                                                         maxLines:
@@ -686,6 +733,9 @@ class _HomePageState extends State<HomePage> {
                                                                       ),
                                                                       hasIcon:
                                                                           true,
+                                                                      iconColor:
+                                                                          color
+                                                                              .secondaryTextColor,
                                                                       tapBodyToCollapse:
                                                                           true,
                                                                       tapHeaderToExpand:
@@ -700,6 +750,10 @@ class _HomePageState extends State<HomePage> {
                                                                             Widget>[
                                                                           Text(
                                                                             currentBody,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: color.secondaryTextColor,
+                                                                            ),
                                                                             softWrap:
                                                                                 true,
                                                                           ),
@@ -764,6 +818,7 @@ class RegisterRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: color.secondaryColor,
       body: Center(
         child: RaisedButton(
           onPressed: () {
@@ -785,10 +840,11 @@ class LunchCheckInRoute extends StatelessWidget {
   DocumentReference snapshot;
 
   Future getuid() async {
-    var document = await Firestore.instance.collection('users').document(email);
+    var document =
+        await FirebaseFirestore.instance.collection('users').doc(email);
     document.get().then((document) {
       //print(document);
-      uID = document.data['utsavID'];
+      uID = document.data()['utsavID'];
     });
   }
 
@@ -801,9 +857,10 @@ class LunchCheckInRoute extends StatelessWidget {
     getuid().then((value) => isUID = true);
     //print(email);
     return Scaffold(
+      backgroundColor: color.secondaryColor,
       appBar: AppBar(
         title: Text('Check In'),
-        backgroundColor: primaryColor,
+        backgroundColor: color.primaryColor,
       ),
       body: Center(
         child: Column(
@@ -822,9 +879,9 @@ class LunchCheckInRoute extends StatelessWidget {
                   //Text('FIX ME'),
                   //Text('BAD UTSAV ID'),
                   StreamBuilder(
-                      stream: Firestore.instance
+                      stream: FirebaseFirestore.instance
                           .collection('users')
-                          .document(email)
+                          .doc(email)
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
@@ -884,7 +941,7 @@ class LunchCheckInRoute extends StatelessWidget {
                           return Card(
                               margin: const EdgeInsets.symmetric(vertical: 12),
                               elevation: 4,
-                              color: Colors.white,
+                              color: color.secondaryLightColor,
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(24))),
@@ -1070,8 +1127,8 @@ class _AccountRouteState extends State<AccountRoute> {
               child: const Text('CONFIRM'),
               onPressed: () {
                 var snapshot =
-                    Firestore.instance.collection('users').document(email);
-                snapshot.updateData({'utsavID': newUtsavId});
+                    FirebaseFirestore.instance.collection('users').doc(email);
+                snapshot.update({'utsavID': newUtsavId});
                 Navigator.of(context).pop();
               },
             )
@@ -1086,68 +1143,77 @@ class _AccountRouteState extends State<AccountRoute> {
     //final url = 'https://project-delta-db6b3.firebaseio.com/test_1.json?auth=$authToken';
     return MaterialApp(
         theme: new ThemeData(
-          primaryColor: Color(0xFFc1451c),
-          primaryColorLight: Color(0xFFfa7548),
-          primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: prefix0.secondaryColor,
+          primaryColor: color.primaryColor,
+          primaryColorLight: color.primaryLightColor,
+          primaryColorDark: color.primaryDarkColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
+            backgroundColor: color.secondaryColor,
             drawer: Drawer(
-              child: ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(name),
-                    accountEmail: Text(email),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundImage: NetworkImage(profilePic),
+              child: Container(
+                color: color.secondaryLightColor,
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    UserAccountsDrawerHeader(
+                      accountName: Text(name),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        backgroundImage: NetworkImage(profilePic),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('Home'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/home');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Schedule'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/schedule');
-                    },
-                  ),
-                  ListTile(
-                    title: Text(
-                      'My Account',
-                      style: TextStyle(color: primaryDarkColor),
+                    ListTile(
+                      title: Text('Home',
+                          style: TextStyle(color: color.secondaryTextColor)),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/home');
+                      },
                     ),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    title: Text('Contact Us'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/contact');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Settings'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/settings');
-                    },
-                  ),
-                  // ListTile(
-                  //   title: Text('Volunteer'),
-                  //   onTap: () {
-                  //     Navigator.of(context).pushReplacementNamed('/volunteer');
-                  //   },
-                  // ),
-                  ListTile(
-                    title: Text('About'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/about');
-                    },
-                  ),
-                ],
+                    ListTile(
+                      title: Text('Schedule',
+                          style: TextStyle(color: color.secondaryTextColor)),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/schedule');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'My Account',
+                        style: TextStyle(color: color.primaryDarkColor),
+                      ),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      title: Text('Contact Us',
+                          style: TextStyle(color: color.secondaryTextColor)),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/contact');
+                      },
+                    ),
+                    ListTile(
+                      title: Text('Settings',
+                          style: TextStyle(color: color.secondaryTextColor)),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/settings');
+                      },
+                    ),
+                    // ListTile(
+                    //   title: Text('Volunteer'),
+                    //   onTap: () {
+                    //     Navigator.of(context).pushReplacementNamed('/volunteer');
+                    //   },
+                    // ),
+                    ListTile(
+                      title: Text('About',
+                          style: TextStyle(color: color.secondaryTextColor)),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/about');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             appBar: AppBar(
@@ -1200,7 +1266,7 @@ class _AccountRouteState extends State<AccountRoute> {
                         style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFFFFFFF)),
+                            color: Colors.white),
                       ),
                     ),
                     Column(
@@ -1208,9 +1274,9 @@ class _AccountRouteState extends State<AccountRoute> {
                         Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: StreamBuilder(
-                                stream: Firestore.instance
+                                stream: FirebaseFirestore.instance
                                     .collection('users')
-                                    .document(email)
+                                    .doc(email)
                                     .snapshots(),
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData)
@@ -1219,7 +1285,7 @@ class _AccountRouteState extends State<AccountRoute> {
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 20),
                                     elevation: 4,
-                                    color: Colors.white,
+                                    color: color.secondaryLightColor,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(24))),
@@ -1305,14 +1371,15 @@ class _AccountRouteState extends State<AccountRoute> {
                                                           child: Text(
                                                             'No',
                                                             style: TextStyle(
-                                                                color:
-                                                                    primaryColor),
+                                                                color: color
+                                                                    .primaryColor),
                                                           )),
                                                       RaisedButton(
                                                         child: Text('Confirm'),
-                                                        color: primaryColor,
-                                                        highlightColor:
-                                                            primaryLightColor,
+                                                        color:
+                                                            color.primaryColor,
+                                                        highlightColor: color
+                                                            .primaryLightColor,
                                                         onPressed: () {
                                                           http.post(
                                                               'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyAfXLxZRkJ-rB00Z9TCrBRdJizZ6AQriH4',
@@ -1415,16 +1482,20 @@ class _AccountRouteState extends State<AccountRoute> {
                                                         FontWeight.bold),
                                                 textAlign: TextAlign.start,
                                               )),
-                                              Divider(),
+                                          Divider(),
                                           OutlineButton(
                                             child: Text('Buy Membership'),
                                             // onPressed: _pay,
                                             onPressed: () {
                                               if (Platform.isAndroid) {
-                                                _launchInApp('https://www.utsavsac.org/membership');
+                                                _launchInApp(
+                                                    'https://www.utsavsac.org/membership');
                                               } else if (Platform.isIOS) {
-                                                var snakbar = SnackBar(content: Text('This is Not Supported on iOS'));
-                                                Scaffold.of(context).showSnackBar(snakbar);
+                                                var snakbar = SnackBar(
+                                                    content: Text(
+                                                        'This is Not Supported on iOS'));
+                                                Scaffold.of(context)
+                                                    .showSnackBar(snakbar);
                                               }
                                             },
                                           ),
@@ -1563,68 +1634,87 @@ class _ScheduleRouteState extends State<ScheduleRoute> {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: new ThemeData(
-          primaryColor: Color(0xFFc1451c),
-          primaryColorLight: Color(0xFFfa7548),
-          primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: prefix0.secondaryColor,
+          primaryColor: color.primaryColor,
+          primaryColorLight: color.primaryLightColor,
+          primaryColorDark: color.primaryDarkColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
+            backgroundColor: color.secondaryColor,
             drawer: Drawer(
-              child: ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(name),
-                    accountEmail: Text(email),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundImage: NetworkImage(profilePic),
+              child: Container(
+                color: color.secondaryLightColor,
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    UserAccountsDrawerHeader(
+                      accountName: Text(name),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        backgroundImage: NetworkImage(profilePic),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('Home'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/home');
-                    },
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Schedule',
-                      style: TextStyle(color: primaryDarkColor),
+                    ListTile(
+                      title: Text(
+                        'Home',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/home');
+                      },
                     ),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    title: Text('My Account'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/account');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Contact Us'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/contact');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Settings'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/settings');
-                    },
-                  ),
-                  // ListTile(
-                  //   title: Text('Volunteer'),
-                  //   onTap: () {
-                  //     Navigator.of(context).pushReplacementNamed('/volunteer');
-                  //   },
-                  // ),
-                  ListTile(
-                    title: Text('About'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/about');
-                    },
-                  ),
-                ],
+                    ListTile(
+                      title: Text(
+                        'Schedule',
+                        style: TextStyle(color: color.primaryDarkColor),
+                      ),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      title: Text(
+                        'My Account',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/account');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Contact Us',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/contact');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Settings',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/settings');
+                      },
+                    ),
+                    // ListTile(
+                    //   title: Text('Volunteer'),
+                    //   onTap: () {
+                    //     Navigator.of(context).pushReplacementNamed('/volunteer');
+                    //   },
+                    // ),
+                    ListTile(
+                      title: Text(
+                        'About',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/about');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             appBar: AppBar(
@@ -1679,7 +1769,7 @@ class _ScheduleRouteState extends State<ScheduleRoute> {
                         style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFFFFFFF)),
+                            color: Colors.white),
                       ),
                     ),
                     Column(children: <Widget>[
@@ -1768,70 +1858,89 @@ class ContactRoute extends StatelessWidget {
           primaryColor: Color(0xFFc1451c),
           primaryColorLight: Color(0xFFfa7548),
           primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: prefix0.secondaryColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
+            backgroundColor: color.secondaryColor,
             drawer: Drawer(
-              child: ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(name),
-                    accountEmail: Text(email),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundImage: NetworkImage(profilePic),
+              child: Container(
+                color: color.secondaryLightColor,
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    UserAccountsDrawerHeader(
+                      accountName: Text(name),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        backgroundImage: NetworkImage(profilePic),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('Home'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/home');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Schedule'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/schedule');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('My Account'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/account');
-                    },
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Contact Us',
-                      style: TextStyle(color: primaryDarkColor),
+                    ListTile(
+                      title: Text(
+                        'Home',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/home');
+                      },
                     ),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    title: Text('Settings'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/settings');
-                    },
-                  ),
-                  // ListTile(
-                  //   title: Text('Volunteer'),
-                  //   onTap: () {
-                  //     Navigator.of(context).pushReplacementNamed('/volunteer');
-                  //   },
-                  // ),
-                  ListTile(
-                    title: Text('About'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/about');
-                    },
-                  ),
-                ],
+                    ListTile(
+                      title: Text(
+                        'Schedule',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/schedule');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'My Account',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/account');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Contact Us',
+                        style: TextStyle(color: color.primaryDarkColor),
+                      ),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Settings',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/settings');
+                      },
+                    ),
+                    // ListTile(
+                    //   title: Text('Volunteer'),
+                    //   onTap: () {
+                    //     Navigator.of(context).pushReplacementNamed('/volunteer');
+                    //   },
+                    // ),
+                    ListTile(
+                      title: Text(
+                        'About',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/about');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: primaryColor,
+              backgroundColor: color.primaryColor,
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
@@ -1887,7 +1996,7 @@ class ContactRoute extends StatelessWidget {
                           Card(
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             elevation: 4,
-                            color: Colors.white,
+                            color: color.secondaryLightColor,
                             shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(24))),
@@ -1896,16 +2005,21 @@ class ContactRoute extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: <Widget>[
-                                  Text('utsavsac.org'),
+                                  Text(
+                                    'utsavsac.org',
+                                    style: TextStyle(
+                                        color: color.secondaryTextColor),
+                                  ),
                                   RaisedButton(
-                                    color: primaryColor,
-                                    highlightColor: primaryLightColor,
+                                    color: color.primaryColor,
+                                    highlightColor: color.primaryLightColor,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10))),
                                     child: Text(
                                       'Go to our website',
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(
+                                          color: Colors.white),
                                     ),
                                     onPressed: () {
                                       _launchInApp('https://www.utsavsac.org');
@@ -1918,7 +2032,7 @@ class ContactRoute extends StatelessWidget {
                           Card(
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             elevation: 4,
-                            color: Colors.white,
+                            color: color.secondaryLightColor,
                             shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(24))),
@@ -1927,17 +2041,20 @@ class ContactRoute extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: <Widget>[
-                                  Text('utsavpr@gmail.com'),
+                                  Text(
+                                    'utsavpr@gmail.com',
+                                    style: TextStyle(
+                                        color: color.secondaryTextColor),
+                                  ),
                                   RaisedButton(
-                                    color: primaryColor,
-                                    highlightColor: primaryLightColor,
+                                    color: color.primaryColor,
+                                    highlightColor: color.primaryLightColor,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10))),
-                                    child: Text(
-                                      'Email us',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
+                                    child: Text('Email us',
+                                        style: TextStyle(
+                                            color: Colors.white)),
                                     onPressed: () {
                                       _launchInApp(
                                           'mailto:utsavpr@gmail.com?subject=Beta%20Tester');
@@ -1950,7 +2067,7 @@ class ContactRoute extends StatelessWidget {
                           Card(
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             elevation: 4,
-                            color: Colors.white,
+                            color: color.secondaryLightColor,
                             shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(24))),
@@ -1959,17 +2076,20 @@ class ContactRoute extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: <Widget>[
-                                  Text('916-294-5088'),
+                                  Text(
+                                    '916-294-5088',
+                                    style: TextStyle(
+                                        color: color.secondaryTextColor),
+                                  ),
                                   RaisedButton(
-                                      color: primaryColor,
-                                      highlightColor: primaryLightColor,
+                                      color: color.primaryColor,
+                                      highlightColor: color.primaryLightColor,
                                       shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10))),
-                                      child: Text(
-                                        'Call us',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                                      child: Text('Call us',
+                                          style: TextStyle(
+                                              color: Colors.white)),
                                       onPressed: () {
                                         _launchInApp('tel:+1 916 294 5088');
                                       } //_launchCaller(),
@@ -2002,70 +2122,89 @@ class SettingsRoute extends StatelessWidget {
           primaryColor: Color(0xFFc1451c),
           primaryColorLight: Color(0xFFfa7548),
           primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: prefix0.secondaryColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
+            backgroundColor: color.secondaryColor,
             drawer: Drawer(
-              child: ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(name),
-                    accountEmail: Text(email),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundImage: NetworkImage(profilePic),
+              child: Container(
+                color: color.secondaryLightColor,
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    UserAccountsDrawerHeader(
+                      accountName: Text(name),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        backgroundImage: NetworkImage(profilePic),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('Home'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/home');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Schedule'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/schedule');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('My Account'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/account');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Contact Us'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/contact');
-                    },
-                  ),
-                  ListTile(
-                    title: Text(
-                      'Settings',
-                      style: TextStyle(color: primaryDarkColor),
+                    ListTile(
+                      title: Text(
+                        'Home',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/home');
+                      },
                     ),
-                    onTap: () {},
-                  ),
-                  // ListTile(
-                  //   title: Text('Volunteer'),
-                  //   onTap: () {
-                  //     Navigator.of(context).pushReplacementNamed('/volunteer');
-                  //   },
-                  // ),
-                  ListTile(
-                    title: Text('About'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/about');
-                    },
-                  ),
-                ],
+                    ListTile(
+                      title: Text(
+                        'Schedule',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/schedule');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'My Account',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/account');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Contact Us',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/contact');
+                      },
+                    ),
+                    ListTile(
+                      title: Text(
+                        'Settings',
+                        style: TextStyle(color: color.primaryDarkColor),
+                      ),
+                      onTap: () {},
+                    ),
+                    // ListTile(
+                    //   title: Text('Volunteer'),
+                    //   onTap: () {
+                    //     Navigator.of(context).pushReplacementNamed('/volunteer');
+                    //   },
+                    // ),
+                    ListTile(
+                      title: Text(
+                        'About',
+                        style: TextStyle(color: color.secondaryTextColor),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/about');
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: primaryColor,
+              backgroundColor: color.primaryColor,
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
@@ -2146,6 +2285,7 @@ class _SignupStep2State extends State<SignupStep2> {
     transformConfig.translate(-10.0);
     var utsavID;
     return Scaffold(
+      backgroundColor: color.secondaryColor,
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
             child: Container(
@@ -2159,6 +2299,7 @@ class _SignupStep2State extends State<SignupStep2> {
                         key: utsavID,
                         flex: deviceSize.width > 600 ? 2 : 1,
                         child: Card(
+                          color: color.secondaryLightColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
@@ -2177,14 +2318,15 @@ class _SignupStep2State extends State<SignupStep2> {
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20,
-                                        color: primaryDarkColor),
+                                        color: color.primaryDarkColor),
                                   ),
                                   TextField(
                                     key: utsavID,
+                                    style: TextStyle(color: Colors.white),
                                     maxLength: 6,
                                     keyboardType: TextInputType.number,
                                     decoration:
-                                        InputDecoration(labelText: 'Utsav ID'),
+                                        InputDecoration(labelText: 'Utsav ID', labelStyle: TextStyle(color: Colors.white)),
                                     controller: utsavIDC,
                                   ),
                                   GestureDetector(
@@ -2242,15 +2384,17 @@ class _SignupStep2State extends State<SignupStep2> {
                                   TextField(
                                     onSubmitted: (value) => _name = value,
                                     keyboardType: TextInputType.text,
+                                    style: TextStyle(color: Colors.white),
                                     decoration:
-                                        InputDecoration(labelText: 'Name'),
+                                        InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.white)),
                                     textCapitalization:
                                         TextCapitalization.words,
                                   ),
                                   TextField(
                                     keyboardType: TextInputType.phone,
+                                    style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
-                                        labelText: 'Phone Number'),
+                                        labelText: 'Phone Number', labelStyle: TextStyle(color: Colors.white), ),
                                     onSubmitted: (value) =>
                                         _phoneNumber = value,
                                   ),
@@ -2260,10 +2404,11 @@ class _SignupStep2State extends State<SignupStep2> {
                                   RaisedButton(
                                       child: Text(
                                         'Done',
-                                        style: TextStyle(color: secondaryColor),
+                                        style: TextStyle(
+                                            color: color.secondaryColor),
                                       ),
-                                      color: primaryColor,
-                                      highlightColor: prefix0.primaryLightColor,
+                                      color: color.primaryColor,
+                                      highlightColor: color.primaryLightColor,
                                       onPressed: () async {
                                         //print(_phoneNumber.toString());
                                         //print(_name.toString());
@@ -2293,16 +2438,16 @@ class _SignupStep2State extends State<SignupStep2> {
                                         //   });
                                         // });
                                         final databaseReference =
-                                            Firestore.instance;
+                                            FirebaseFirestore.instance;
                                         try {
                                           databaseReference
                                               .collection('users')
-                                              .document(user.email)
-                                              .setData({
+                                              .doc(user.email)
+                                              .set({
                                             'phoneNumber': _phoneNumber,
                                             'utsavID': utsavIDC.text,
                                             'name': _name
-                                          }, merge: true);
+                                          });
                                         } catch (e) {
                                           print(e.toString());
                                         }
@@ -2364,7 +2509,7 @@ class HalfCircle extends CustomPainter {
 
   Paint customPaint() {
     Paint paint = Paint();
-    paint.color = primaryColor;
+    paint.color = color.primaryColor;
     paint.isAntiAlias = true;
     paint.strokeWidth = 10;
     return paint;
@@ -2461,9 +2606,9 @@ Widget _myListView(BuildContext context) {
           return Container(
               padding: EdgeInsets.all(20),
               child: CircularProgressIndicator(
-                backgroundColor: primaryDarkColor,
+                backgroundColor: color.primaryDarkColor,
                 valueColor:
-                    new AlwaysStoppedAnimation<Color>(primaryLightColor),
+                    new AlwaysStoppedAnimation<Color>(color.primaryLightColor),
               ));
         } else {
           //print(snapshot.data.length);
@@ -2476,7 +2621,7 @@ Widget _myListView(BuildContext context) {
                 return Card(
                     margin: const EdgeInsets.symmetric(vertical: 12),
                     elevation: 4,
-                    color: Colors.white,
+                    color: color.secondaryLightColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(24))),
                     child: Padding(
@@ -2525,15 +2670,15 @@ Widget _myListView(BuildContext context) {
 Widget _myFSListView(BuildContext context) {
   return Container(
       child: StreamBuilder(
-          stream: Firestore.instance.collection('Schedule').snapshots(),
+          stream: FirebaseFirestore.instance.collection('Schedule').snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData)
               return Container(
                   padding: EdgeInsets.all(21),
                   child: CircularProgressIndicator(
-                    backgroundColor: primaryDarkColor,
-                    valueColor:
-                        new AlwaysStoppedAnimation<Color>(primaryLightColor),
+                    backgroundColor: color.primaryDarkColor,
+                    valueColor: new AlwaysStoppedAnimation<Color>(
+                        color.primaryLightColor),
                   ));
 
             List<Events> myEventList = [];
@@ -2573,7 +2718,7 @@ Widget _myFSListView(BuildContext context) {
                       child: Card(
                         margin: const EdgeInsets.symmetric(vertical: 12),
                         elevation: 4,
-                        color: Colors.white,
+                        color: color.secondaryLightColor,
                         shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(24))),
@@ -2598,7 +2743,9 @@ Widget _myFSListView(BuildContext context) {
                                 DateFormat('E hh:mm a')
                                     .format(myEventList[index].time)
                                     .toString(),
-                                style: TextStyle(fontSize: 16),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: color.secondaryTextColor),
                               )
                             ],
                           ),

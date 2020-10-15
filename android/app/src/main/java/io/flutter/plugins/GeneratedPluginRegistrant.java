@@ -1,10 +1,10 @@
 package io.flutter.plugins;
 
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugins.firebase.cloudfirestore.CloudFirestorePlugin;
-import io.flutter.plugins.firebaseauth.FirebaseAuthPlugin;
-import io.flutter.plugins.firebase.core.FirebaseCorePlugin;
-import io.flutter.plugins.firebase.crashlytics.firebasecrashlytics.FirebaseCrashlyticsPlugin;
+import io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestorePlugin;
+import io.flutter.plugins.firebase.auth.FlutterFirebaseAuthPlugin;
+import io.flutter.plugins.firebase.core.FlutterFirebaseCorePlugin;
+import io.flutter.plugins.firebase.crashlytics.FlutterFirebaseCrashlyticsPlugin;
 import io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin;
 import com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin;
 import io.flutter.plugins.googlesignin.GoogleSignInPlugin;
@@ -19,10 +19,10 @@ public final class GeneratedPluginRegistrant {
     if (alreadyRegisteredWith(registry)) {
       return;
     }
-    CloudFirestorePlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.cloudfirestore.CloudFirestorePlugin"));
-    FirebaseAuthPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebaseauth.FirebaseAuthPlugin"));
-    FirebaseCorePlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.core.FirebaseCorePlugin"));
-    FirebaseCrashlyticsPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.crashlytics.firebasecrashlytics.FirebaseCrashlyticsPlugin"));
+    FlutterFirebaseFirestorePlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestorePlugin"));
+    FlutterFirebaseAuthPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.auth.FlutterFirebaseAuthPlugin"));
+    FlutterFirebaseCorePlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.core.FlutterFirebaseCorePlugin"));
+    FlutterFirebaseCrashlyticsPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebase.crashlytics.FlutterFirebaseCrashlyticsPlugin"));
     FirebaseMessagingPlugin.registerWith(registry.registrarFor("io.flutter.plugins.firebasemessaging.FirebaseMessagingPlugin"));
     FlutterLocalNotificationsPlugin.registerWith(registry.registrarFor("com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin"));
     GoogleSignInPlugin.registerWith(registry.registrarFor("io.flutter.plugins.googlesignin.GoogleSignInPlugin"));

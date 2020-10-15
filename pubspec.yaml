@@ -26,12 +26,12 @@ dependencies:
   flutter_local_notifications:
   http: 
   provider: 
-  firebase_messaging: 
+  firebase_messaging:
   firebase_core:
   url_launcher:
   cloud_firestore:
   intl:
-  flutter_phoenix: 
+  flutter_phoenix: "^0.1.0"
   shared_preferences:
   get_it:
   flutter_bloc:
@@ -44,7 +44,7 @@ dependencies:
   flare_splash_screen: 
   animations: 
   google_sign_in: 
-  rxdart: 
+  rxdart: ^0.20.0
   expandable: 
 
 

@@ -30,7 +30,7 @@ class AnnouncementsRoute extends StatelessWidget {
           primaryColor: Color(0xFFc1451c),
           primaryColorLight: Color(0xFFfa7548),
           primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: secondaryColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
             // drawer: Drawer(
@@ -99,7 +99,7 @@ class AnnouncementsRoute extends StatelessWidget {
 
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: primaryColor,
+              backgroundColor: color.primaryColor,
               // leading: Builder(
               //   builder: (BuildContext context) {
               //     return IconButton(
@@ -157,7 +157,7 @@ class AnnouncementsRoute extends StatelessWidget {
                           Card(
                               margin: const EdgeInsets.symmetric(vertical: 20),
                               elevation: 4,
-                              color: Colors.white,
+                              color: color.secondaryLightColor,
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(24))),
@@ -173,11 +173,12 @@ class AnnouncementsRoute extends StatelessWidget {
                                               padding: EdgeInsets.all(21),
                                               child: CircularProgressIndicator(
                                                 backgroundColor:
-                                                    primaryDarkColor,
+                                                    color.primaryDarkColor,
                                                 valueColor:
                                                     new AlwaysStoppedAnimation<
                                                             Color>(
-                                                        primaryLightColor),
+                                                        color
+                                                            .primaryLightColor),
                                               ));
 
                                         List<Announcement> myAnnouncementList =
@@ -186,12 +187,14 @@ class AnnouncementsRoute extends StatelessWidget {
                                             i < snapshot.data.documents.length;
                                             i++) {
                                           Announcement _event = Announcement(
-                                            snapshot.data.documents[i]['body'],
-                                            snapshot.data.documents[i]
-                                                ['imageUrl'],
-                                            snapshot.data.documents[i]['index'],
-                                            snapshot.data.documents[i]['time']
-                                          );
+                                              snapshot.data.documents[i]
+                                                  ['body'],
+                                              snapshot.data.documents[i]
+                                                  ['imageUrl'],
+                                              snapshot.data.documents[i]
+                                                  ['index'],
+                                              snapshot.data.documents[i]
+                                                  ['time']);
 
                                           myAnnouncementList.add(_event);
                                         }
@@ -210,12 +213,27 @@ class AnnouncementsRoute extends StatelessWidget {
                                                 int index) {
                                               return Column(
                                                 children: <Widget>[
-                                                  Text(myAnnouncementList[index].time, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey, fontSize: 16),),
-                                                   Text(myAnnouncementList[index].body),
-                                                   SizedBox(height: 10,),
-                                                   Image.network(myAnnouncementList[index].imageUrl),
-                                                   Divider(),
-                                                   SizedBox(height: 20,)     
+                                                  Text(
+                                                    myAnnouncementList[index]
+                                                        .time,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.blueGrey,
+                                                        fontSize: 16),
+                                                  ),
+                                                  Text(myAnnouncementList[index]
+                                                      .body),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Image.network(
+                                                      myAnnouncementList[index]
+                                                          .imageUrl),
+                                                  Divider(),
+                                                  SizedBox(
+                                                    height: 20,
+                                                  )
                                                 ],
                                               );
                                             },

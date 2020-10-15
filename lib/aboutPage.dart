@@ -28,72 +28,76 @@ class AboutRoute extends StatelessWidget {
           primaryColor: Color(0xFFc1451c),
           primaryColorLight: Color(0xFFfa7548),
           primaryColorDark: Color(0xFF8a0e00),
-          secondaryHeaderColor: secondaryColor,
+          secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
+          backgroundColor: color.secondaryColor,
             drawer: Drawer(
-              child: ListView(
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  UserAccountsDrawerHeader(
-                    accountName: Text(name),
-                    accountEmail: Text(email),
-                    currentAccountPicture: CircleAvatar(
-                      backgroundImage: NetworkImage(profilePic),
+              child: Container(
+                color: color.secondaryColor,
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    UserAccountsDrawerHeader(
+                      accountName: Text(name),
+                      accountEmail: Text(email),
+                      currentAccountPicture: CircleAvatar(
+                        backgroundImage: NetworkImage(profilePic),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('Home'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Schedule'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/schedule');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('My Account'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/account');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Contact Us'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/contact');
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Settings'),
-                    onTap: () {
-                      Navigator.of(context).pushReplacementNamed('/settings');
-                    },
-                  ),
-                  // ListTile(
-                  //     title: Text(
-                  //       'Volunteer',
-                  //     ),
-                  //     onTap: () {
-                  //       Navigator.of(context)
-                  //           .pushReplacementNamed('/volunteer');
-                  //     }),
-                  ListTile(
-                    title: Text(
-                      'About',
-                      style: TextStyle(color: primaryDarkColor),
+                    ListTile(
+                      title: Text('Home', style: TextStyle(color: color.secondaryTextColor),),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/');
+                      },
                     ),
-                    onTap: () {},
-                  ),
-                ],
+                    ListTile(
+                      title: Text('Schedule', style: TextStyle(color: color.secondaryTextColor),),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/schedule');
+                      },
+                    ),
+                    ListTile(
+                      title: Text('My Account', style: TextStyle(color: color.secondaryTextColor),),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/account');
+                      },
+                    ),
+                    ListTile(
+                      title: Text('Contact Us', style: TextStyle(color: color.secondaryTextColor),),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/contact');
+                      },
+                    ),
+                    ListTile(
+                      title: Text('Settings', style: TextStyle(color: color.secondaryTextColor),),
+                      onTap: () {
+                        Navigator.of(context).pushReplacementNamed('/settings');
+                      },
+                    ),
+                    // ListTile(
+                    //     title: Text(
+                    //       'Volunteer',
+                    //     ),
+                    //     onTap: () {
+                    //       Navigator.of(context)
+                    //           .pushReplacementNamed('/volunteer');
+                    //     }),
+                    ListTile(
+                      title: Text(
+                        'About',
+                        style: TextStyle(color: color.primaryDarkColor),
+                      ),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
               ),
             ),
             appBar: AppBar(
               elevation: 0,
-              backgroundColor: primaryColor,
+              backgroundColor: color.primaryColor,
               leading: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
@@ -148,7 +152,7 @@ class AboutRoute extends StatelessWidget {
                           Card(
                               margin: const EdgeInsets.symmetric(vertical: 20),
                               elevation: 4,
-                              color: Colors.white,
+                              color: color.secondaryLightColor,
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(24))),
@@ -164,13 +168,15 @@ class AboutRoute extends StatelessWidget {
                                         height: 20,
                                       ),
                                       Text(
-                                          'This application is created and owned by KidsonX \n\nCopyright© KidsonX 2020. All Rights Reserved\n\nPatent Pending.'),
+                                          'This application is created and owned by KidsonX \n\nCopyright© KidsonX 2020. All Rights Reserved\n\nPatent Pending.'
+                                          , style: TextStyle(color: color.secondaryTextColor),
+                                          ),
                                     ],
                                   ))),
                           Card(
                             margin: const EdgeInsets.symmetric(vertical: 20),
                             elevation: 4,
-                            color: Colors.white,
+                            color: color.secondaryLightColor,
                             shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(24))),
@@ -179,10 +185,10 @@ class AboutRoute extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: <Widget>[
-                                  Text('Email us at: kidsonx.pr@gmail.com'),
+                                  Text('Email us at: kidsonx.pr@gmail.com', style: TextStyle(color: color.secondaryTextColor),),
                                   RaisedButton(
-                                    color: primaryColor,
-                                    highlightColor: primaryLightColor,
+                                    color: color.primaryColor,
+                                    highlightColor: color.primaryLightColor,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10))),
