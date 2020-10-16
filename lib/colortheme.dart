@@ -7,7 +7,7 @@ colorInit(colorTxt) {
   var brightness = SchedulerBinding.instance.window.platformBrightness;
   darkModeOn = brightness == Brightness.dark;
   if (darkModeOn) {
-    print('Dark Mode Activated for ${colorTxt}');
+    print('Dark Mode Activated for ' + colorTxt);
     var colors = <String, Color>{
       'primaryColor': Color(0xFFc2451d),
       'primaryLightColor': Color(0xFFfb7649),

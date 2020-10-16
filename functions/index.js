@@ -113,7 +113,7 @@ function mailConfirm(req, res) {
                                                     <p style="text-align: start; margin-left: 10vw;">
                                                         <input type="checkbox" name="" id=""  ${isChecked(req.body.driveby)}>
                                                         <b>Driveby Darshan</b> <br>
-                                                        <input type="checkbox" name="" id="" onclick="return false;" ${isChecked(req.body.bhog)}> <b>Bhog Pickup/Delivery</b>
+                                                        <input type="checkbox" name="" id="" onclick="return false;" ${isChecked(req.body.bhog)}> <b>Bhog Pickup</b>
                                                         <br>
                                                         <input type="checkbox" name="" id="" onclick="return false;" ${isChecked(req.body.prasad)}>
                                                         <b>Prasad Pickup</b> <br>

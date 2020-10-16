@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as f;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:google_sign_in/google_sign_in.dart' as g;
 import 'package:project_delta/http_exception.dart';
 import 'package:http/http.dart' as http;
@@ -94,7 +93,6 @@ class Auth with ChangeNotifier {
   }
 
   Future<bool> tryAutoLogin(User user) async {
-    String email = '';
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('userData')) {
       return false;
@@ -233,5 +231,4 @@ class AuthService {
   }
 }
 
-// TODO refactor global to InheritedWidget
 final AuthService authService = AuthService();

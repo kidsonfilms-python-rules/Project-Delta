@@ -192,10 +192,10 @@ class _AuthCardState extends State<AuthCard> {
         user.profilePic =
             'https://www.gyanbar.com/wp-content/uploads/2019/07/Facebook-Profile-Pictures-3.jpg';
         Navigator.of(context).pushReplacementNamed('/secondstep');
-        await Firestore.instance
+        await FirebaseFirestore.instance
             .collection("users")
-            .document(user.email)
-            .setData({});
+            .doc(user.email)
+            .set({});
       }
     } on HttpException catch (error) {
       var errorMessage = 'Authentication failed';

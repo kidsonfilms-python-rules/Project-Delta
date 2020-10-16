@@ -3,28 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:project_delta/announcements_model.dart';
 import 'package:project_delta/colortheme.dart';
 import 'package:project_delta/main.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AnnouncementsRoute extends StatelessWidget {
   final String email;
   final String profilePic;
   final String name;
-  Future<void> _launchInApp(String url) async {
-    if (await canLaunch(url)) {
-      await launch(
-        url,
-        forceWebView: false,
-        forceSafariVC: false,
-      );
-    } else {
-      throw 'Could not go to $url';
-    }
-  }
 
   AnnouncementsRoute(this.email, this.profilePic, this.name);
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return MaterialApp(
         theme: new ThemeData(
           primaryColor: Color(0xFFc1451c),
@@ -164,7 +151,7 @@ class AnnouncementsRoute extends StatelessWidget {
                               child: Padding(
                                   padding: const EdgeInsets.all(20),
                                   child: StreamBuilder(
-                                      stream: Firestore.instance
+                                      stream: FirebaseFirestore.instance
                                           .collection('Announcements')
                                           .snapshots(),
                                       builder: (context, snapshot) {

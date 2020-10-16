@@ -13,7 +13,7 @@ class MessageHandler extends StatefulWidget {
 class _MessageHandlerState extends State<MessageHandler> {
   final FirebaseMessaging _fcm = FirebaseMessaging();
   StreamSubscription iosSubscription;
-  final Firestore _db = Firestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   @override
   void initState() {
     super.initState();
@@ -91,11 +91,11 @@ class _MessageHandlerState extends State<MessageHandler> {
     if (fcmToken != null) {
       var tokens = _db
           .collection('users')
-          .document(uid)
+          .doc(uid)
           .collection('tokens')
-          .document(fcmToken);
+          .doc(fcmToken);
 
-      await tokens.setData({
+      await tokens.set({
         'token': fcmToken,
         'createdAt': FieldValue.serverTimestamp(), // optional
         'platform': Platform.operatingSystem // optional
@@ -104,8 +104,8 @@ class _MessageHandlerState extends State<MessageHandler> {
   }
 
   /// Subscribe the user to a topic
-  _subscribeToTopic() async {
-    // Subscribe the user to a topic
-    _fcm.subscribeToTopic('puppies');
-  }
+//   _subscribeToTopic() async {
+//     // Subscribe the user to a topic
+//     _fcm.subscribeToTopic('puppies');
+//   }
 }

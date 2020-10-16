@@ -22,7 +22,6 @@ class AboutRoute extends StatelessWidget {
   AboutRoute(this.email, this.profilePic, this.name);
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return MaterialApp(
         theme: new ThemeData(
           primaryColor: Color(0xFFc1451c),
