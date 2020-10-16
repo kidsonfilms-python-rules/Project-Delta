@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_delta/http_exception.dart';
@@ -583,27 +584,29 @@ class _AuthCardState extends State<AuthCard> {
                                   ),
                                 ),
                               ),
-                            Container(
-                              margin: EdgeInsets.only(top: 15),
-                              height: 55,
-                              width: 55,
-                              decoration: BoxDecoration(
-                                color: color.primaryColor,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: FlatButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'f',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Platform.isIOS
+                                ? Container(
+                                    margin: EdgeInsets.only(top: 15),
+                                    height: 55,
+                                    width: 55,
+                                    decoration: BoxDecoration(
+                                      color: color.primaryColor,
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: FlatButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                        'A',
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Text('')
                           ],
                         ),
                         Container(

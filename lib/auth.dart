@@ -212,7 +212,7 @@ class AuthService {
       firstSignin = false;
     }
 
-    return ref.set({
+    return ref.update({
       'uid': user.uid,
       'email': user.email,
       'photoURL': user.photoURL,

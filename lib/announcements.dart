@@ -20,6 +20,7 @@ class AnnouncementsRoute extends StatelessWidget {
           secondaryHeaderColor: color.secondaryColor,
         ),
         home: Scaffold(
+          backgroundColor: color.secondaryColor,
             // drawer: Drawer(
             //   child: ListView(
             //     // Important: Remove any padding from the ListView.

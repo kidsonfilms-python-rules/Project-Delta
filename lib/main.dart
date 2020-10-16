@@ -1274,7 +1274,7 @@ class _AccountRouteState extends State<AccountRoute> {
                             child: StreamBuilder(
                                 stream: FirebaseFirestore.instance
                                     .collection('users')
-                                    .doc(email)
+                                    .doc('sidraystudios@gmail.com')
                                     .snapshots(),
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData)
@@ -1330,8 +1330,11 @@ class _AccountRouteState extends State<AccountRoute> {
                                                 alignment: Alignment(0, 10),
                                                 child: Text(
                                                   email,
-                                                  style:
-                                                      TextStyle(fontSize: 18),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: color
+                                                        .secondaryTextColor,
+                                                  ),
                                                   textAlign: TextAlign.start,
                                                 )),
                                           ),
@@ -1400,8 +1403,11 @@ class _AccountRouteState extends State<AccountRoute> {
                                                 alignment: Alignment(0, 10),
                                                 child: Text(
                                                   'Change Password',
-                                                  style:
-                                                      TextStyle(fontSize: 18),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: color
+                                                        .secondaryTextColor,
+                                                  ),
                                                   textAlign: TextAlign.start,
                                                 )),
                                           ),
@@ -1414,8 +1420,11 @@ class _AccountRouteState extends State<AccountRoute> {
                                               children: <Widget>[
                                                 Text(
                                                   'Utsav ID',
-                                                  style:
-                                                      TextStyle(fontSize: 18),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: color
+                                                        .secondaryTextColor,
+                                                  ),
                                                   textAlign: TextAlign.start,
                                                 ),
                                                 Container(
@@ -1442,19 +1451,24 @@ class _AccountRouteState extends State<AccountRoute> {
                                                             ),
                                                             Text(
                                                                 'Tap and hold to set up',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        15))
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 15,
+                                                                  color: color
+                                                                      .secondaryTextColor,
+                                                                ))
                                                           ],
                                                         )
                                                       : Text(
                                                           snapshot
                                                               .data["utsavID"],
                                                           style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: color
+                                                                .secondaryTextColor,
+                                                          ),
                                                           textAlign:
                                                               TextAlign.start,
                                                         ),
@@ -1465,7 +1479,10 @@ class _AccountRouteState extends State<AccountRoute> {
                                           Divider(),
                                           Text(
                                             'My Memberships',
-                                            style: TextStyle(fontSize: 18),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color: color.secondaryTextColor,
+                                            ),
                                             textAlign: TextAlign.start,
                                           ),
                                           Container(
@@ -1475,14 +1492,20 @@ class _AccountRouteState extends State<AccountRoute> {
                                               child: Text(
                                                 membershipName,
                                                 style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:
+                                                      color.secondaryTextColor,
+                                                ),
                                                 textAlign: TextAlign.start,
                                               )),
                                           Divider(),
                                           OutlineButton(
-                                            child: Text('Buy Membership'),
+                                            child: Text('Buy Membership',
+                                                style: TextStyle(
+                                                  color:
+                                                      color.secondaryTextColor,
+                                                )),
                                             // onPressed: _pay,
                                             onPressed: () {
                                               if (Platform.isAndroid) {
@@ -1567,6 +1590,7 @@ class _AccountRouteState extends State<AccountRoute> {
                                                     new BorderRadius.circular(
                                                         100.0)),
                                             highlightedBorderColor: Colors.red,
+                                            color: Colors.red,
                                           ),
                                         ])),
                                   );
@@ -2016,8 +2040,7 @@ class ContactRoute extends StatelessWidget {
                                             Radius.circular(10))),
                                     child: Text(
                                       'Go to our website',
-                                      style: TextStyle(
-                                          color: Colors.white),
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                     onPressed: () {
                                       _launchInApp('https://www.utsavsac.org');
@@ -2051,8 +2074,7 @@ class ContactRoute extends StatelessWidget {
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10))),
                                     child: Text('Email us',
-                                        style: TextStyle(
-                                            color: Colors.white)),
+                                        style: TextStyle(color: Colors.white)),
                                     onPressed: () {
                                       _launchInApp(
                                           'mailto:utsavpr@gmail.com?subject=Beta%20Tester');
@@ -2086,8 +2108,8 @@ class ContactRoute extends StatelessWidget {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10))),
                                       child: Text('Call us',
-                                          style: TextStyle(
-                                              color: Colors.white)),
+                                          style:
+                                              TextStyle(color: Colors.white)),
                                       onPressed: () {
                                         _launchInApp('tel:+1 916 294 5088');
                                       } //_launchCaller(),
@@ -2254,6 +2276,35 @@ class SettingsRoute extends StatelessWidget {
                             color: Color(0xFFFFFFFF)),
                       ),
                     ),
+                    Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Column(children: <Widget>[
+                          Card(
+                            margin: const EdgeInsets.symmetric(vertical: 20),
+                            elevation: 4,
+                            color: color.secondaryLightColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(24))),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  Center(
+                                    child: Text(
+                                      'Settings Is Not Supported In Beta',
+                                      style: TextStyle(
+                                          color: color.secondaryTextColor,
+                                          fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ]))
                   ])))
             ])));
   }
@@ -2283,7 +2334,7 @@ class _SignupStep2State extends State<SignupStep2> {
     transformConfig.translate(-10.0);
     var utsavID;
     return Scaffold(
-      backgroundColor: color.secondaryColor,
+        backgroundColor: color.secondaryColor,
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
             child: Container(
@@ -2323,8 +2374,10 @@ class _SignupStep2State extends State<SignupStep2> {
                                     style: TextStyle(color: Colors.white),
                                     maxLength: 6,
                                     keyboardType: TextInputType.number,
-                                    decoration:
-                                        InputDecoration(labelText: 'Utsav ID', labelStyle: TextStyle(color: Colors.white)),
+                                    decoration: InputDecoration(
+                                        labelText: 'Utsav ID',
+                                        labelStyle:
+                                            TextStyle(color: Colors.white)),
                                     controller: utsavIDC,
                                   ),
                                   GestureDetector(
@@ -2383,8 +2436,10 @@ class _SignupStep2State extends State<SignupStep2> {
                                     onSubmitted: (value) => _name = value,
                                     keyboardType: TextInputType.text,
                                     style: TextStyle(color: Colors.white),
-                                    decoration:
-                                        InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.white)),
+                                    decoration: InputDecoration(
+                                        labelText: 'Name',
+                                        labelStyle:
+                                            TextStyle(color: Colors.white)),
                                     textCapitalization:
                                         TextCapitalization.words,
                                   ),
@@ -2392,7 +2447,10 @@ class _SignupStep2State extends State<SignupStep2> {
                                     keyboardType: TextInputType.phone,
                                     style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
-                                        labelText: 'Phone Number', labelStyle: TextStyle(color: Colors.white), ),
+                                      labelText: 'Phone Number',
+                                      labelStyle:
+                                          TextStyle(color: Colors.white),
+                                    ),
                                     onSubmitted: (value) =>
                                         _phoneNumber = value,
                                   ),
