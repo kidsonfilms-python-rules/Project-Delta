@@ -8,6 +8,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:intl/intl.dart';
 import 'package:project_delta/aboutPage.dart';
@@ -54,6 +55,10 @@ main() async {
   });
   // Pass all uncaught errors from the framework to Crashlytics.
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+  
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  systemNavigationBarColor: color.secondaryColor, // navigation bar color
+));
   runApp(MaterialApp(
       //     home: SplashScreen(
       //   'assets/splash.flr',
@@ -2295,9 +2300,9 @@ class SettingsRoute extends StatelessWidget {
                                     child: Text(
                                       'Settings Is Not Supported In Beta',
                                       style: TextStyle(
-                                          color: color.secondaryTextColor,
-                                          fontWeight: FontWeight.bold,
-                                          ),
+                                        color: color.secondaryTextColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -2627,11 +2632,54 @@ class ListPage extends StatelessWidget {
 class BodyLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        _myFSListView(context),
-      ],
-    );
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('Schedule').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData)
+            return Container(
+                padding: EdgeInsets.all(21),
+                child: CircularProgressIndicator(
+                  backgroundColor: color.primaryDarkColor,
+                  valueColor: new AlwaysStoppedAnimation<Color>(
+                      color.primaryLightColor),
+                ));
+
+          List<EventList> myEventList = [];
+          List<int> uniqueDays = [];
+          //for (int i = 0; i < snapshot.data.documents.length; i++) {
+          // List<Events> myEventList = [];
+          for (int i = 0; i < snapshot.data.documents.length; i++) {
+            DateTime daytime =
+                DateTime.parse(snapshot.data.documents[i]['time']);
+            Events _event = Events(
+              snapshot.data.documents[i]['name'],
+              daytime,
+              snapshot.data.documents[i]['index'],
+              snapshot.data.documents[i]['delay'],
+              snapshot.data.documents[i]['body'],
+              snapshot.data.documents[i]['imageUrl'],
+            );
+            // check if this date already exist
+            int index = uniqueDays.indexWhere((int x) {
+              return (x == daytime.day);
+            });
+            if (index >= 0) {
+              myEventList[index].eventList.add(_event);
+            } else {
+              uniqueDays.add(daytime.day);
+              myEventList.add(EventList(daytime, []));
+              myEventList[uniqueDays.length - 1].eventList.add(_event);
+            }
+          }
+
+          myEventList.sort((a, b) => a.date.difference(b.date).inDays);
+
+          List<Widget> list = new List<Widget>();
+          for (var i = 0; i < uniqueDays.length; i++) {
+            list.add(_myFSListView(context, "Day " + (i+1).toString(), myEventList[i]));
+          }
+          return SingleChildScrollView(child: Container(padding: EdgeInsets.symmetric(vertical: 12, horizontal: 2),child: new Column(children: list)));
+        });
   }
 }
 
@@ -2723,142 +2771,253 @@ Widget _myListView(BuildContext context) {
       });
 }
 
-Widget _myFSListView(BuildContext context) {
+Widget _myFSListView(BuildContext context, String dayName, EventList event) {
   return Container(
-      child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('Schedule').snapshots(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData)
-              return Container(
-                  padding: EdgeInsets.all(21),
-                  child: CircularProgressIndicator(
-                    backgroundColor: color.primaryDarkColor,
-                    valueColor: new AlwaysStoppedAnimation<Color>(
-                        color.primaryLightColor),
-                  ));
-
-            List<Events> myEventList = [];
-            //for (int i = 0; i < snapshot.data.documents.length; i++) {
-            // List<Events> myEventList = [];
-            for (int i = 0; i < snapshot.data.documents.length; i++) {
-              Events _event = Events(
-                snapshot.data.documents[i]['name'],
-                DateTime.parse(snapshot.data.documents[i]['time']),
-                snapshot.data.documents[i]['index'],
-                snapshot.data.documents[i]['delay'],
-                snapshot.data.documents[i]['body'],
-                snapshot.data.documents[i]['imageUrl'],
-              );
-
-              myEventList.add(_event);
-            }
-
-            myEventList.sort((a, b) => a.time.compareTo(b.time));
-            //snapshot.data.documents.sort((a, b) => (a['index'] - b['indsex'])); //sort the items based on "index"
-            //print('im here');
-            //print("first name is = " + myEventList[0].name);
-
-            return Container(
-                height: 555,
-                child: ListView.builder(
-                  itemCount: snapshot.data.documents.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) =>
-                                    SchedulePage(myEventList[index])));
-                      },
-                      child: Card(
-                        margin: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 4,
-                        color: color.secondaryLightColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(24))),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 200,
-                                child: Text(myEventList[index].name,
-                                    overflow: TextOverflow.ellipsis,
-                                    textWidthBasis: TextWidthBasis.parent,
-                                    style: TextStyle(
-                                        color: Colors.deepPurple,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                              SizedBox(
-                                width: 15,
-                              ),
-                              Text(
-                                DateFormat('E hh:mm a')
-                                    .format(myEventList[index].time)
-                                    .toString(),
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: color.secondaryTextColor),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ));
-
-            /*ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (ctx, index) {
-                  return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 4,
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(24))),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: <Widget>[
-                            Text(snapshot.data[index].name,
-                                style: TextStyle(
-                                    color: Colors.deepPurple,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
-                            SizedBox(
-                              width: 40,
-                            ),
-                            Text('time')
-                          ],
-                        ),
-                      ));
-                },),*/
-          }));
-
-  //return
-  /*return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            Text(snapshot.data[index].name, style: TextStyle(color: Colors.deepPurple, fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(width: 40,),
-            Text('time')
-          ],
-        ),
+    child: ExpandablePanel(
+      header: Text(
+        dayName,
+        style: TextStyle(
+            color: color.secondaryTextColor,
+            fontSize: 25,
+            fontWeight: FontWeight.bold),
       ),
+      collapsed: Text(
+        '',
+        softWrap: true,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      expanded: Container(
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('Schedule')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData)
+                  return Container(
+                      padding: EdgeInsets.all(21),
+                      child: CircularProgressIndicator(
+                        backgroundColor: color.primaryDarkColor,
+                        valueColor: new AlwaysStoppedAnimation<Color>(
+                            color.primaryLightColor),
+                      ));
+
+                // List<Events> myEventList = [];
+                // //for (int i = 0; i < snapshot.data.documents.length; i++) {
+                // // List<Events> myEventList = [];
+                // for (int i = 0; i < snapshot.data.documents.length; i++) {
+                //   Events _event = Events(
+                //     snapshot.data.documents[i]['name'],
+                //     DateTime.parse(snapshot.data.documents[i]['time']),
+                //     snapshot.data.documents[i]['index'],
+                //     snapshot.data.documents[i]['delay'],
+                //     snapshot.data.documents[i]['body'],
+                //     snapshot.data.documents[i]['imageUrl'],
+                //   );
+
+                //   myEventList.add(_event);
+                // }
+
+                // myEventList.sort((a, b) => a.time.compareTo(b.time));
+                //snapshot.data.documents.sort((a, b) => (a['index'] - b['indsex'])); //sort the items based on "index"
+                //print('im here');
+                //print("first name is = " + myEventList[0].name);
+
+                return Container(
+                    height: (event.eventList.length * 70).toDouble(),
+                    child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      // itemCount: snapshot.data.documents.length,
+                      itemCount: event.eventList.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                new MaterialPageRoute(
+                                    builder: (context) =>
+                                        SchedulePage(event.eventList[index])));
+                          },
+                          child: Card(
+                            margin:
+                                const EdgeInsets.symmetric(vertical: 12),
+                            elevation: 4,
+                            color: color.secondaryLightColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(24))),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Container(
+                                    width: 200,
+                                    child: Text(event.eventList[index].name,
+                                        overflow: TextOverflow.ellipsis,
+                                        textWidthBasis:
+                                            TextWidthBasis.parent,
+                                        style: TextStyle(
+                                            color: Colors.deepPurple,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Text(
+                                    DateFormat('E hh:mm a')
+                                        .format(event.eventList[index].time)
+                                        .toString(),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: color.secondaryTextColor),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ));
+              })),
+      iconColor: color.secondaryTextColor,
     ),
-                );
-              });*/
+  );
+  // return Container(
+  //     child: StreamBuilder(
+  //         stream: FirebaseFirestore.instance.collection('Schedule').snapshots(),
+  //         builder: (context, snapshot) {
+  //           if (!snapshot.hasData)
+  //             return Container(
+  //                 padding: EdgeInsets.all(21),
+  //                 child: CircularProgressIndicator(
+  //                   backgroundColor: color.primaryDarkColor,
+  //                   valueColor: new AlwaysStoppedAnimation<Color>(
+  //                       color.primaryLightColor),
+  //                 ));
+
+  //           List<Events> myEventList = [];
+  //           //for (int i = 0; i < snapshot.data.documents.length; i++) {
+  //           // List<Events> myEventList = [];
+  //           for (int i = 0; i < snapshot.data.documents.length; i++) {
+  //             Events _event = Events(
+  //               snapshot.data.documents[i]['name'],
+  //               DateTime.parse(snapshot.data.documents[i]['time']),
+  //               snapshot.data.documents[i]['index'],
+  //               snapshot.data.documents[i]['delay'],
+  //               snapshot.data.documents[i]['body'],
+  //               snapshot.data.documents[i]['imageUrl'],
+  //             );
+
+  //             myEventList.add(_event);
+  //           }
+
+  //           myEventList.sort((a, b) => a.time.compareTo(b.time));
+  //           //snapshot.data.documents.sort((a, b) => (a['index'] - b['indsex'])); //sort the items based on "index"
+  //           //print('im here');
+  //           //print("first name is = " + myEventList[0].name);
+
+  //           return Container(
+  //               height: 555,
+  //               child: ListView.builder(
+  //                 itemCount: snapshot.data.documents.length,
+  //                 itemBuilder: (context, index) {
+  //                   return GestureDetector(
+  //                     onTap: () {
+  //                       Navigator.push(
+  //                           context,
+  //                           new MaterialPageRoute(
+  //                               builder: (context) =>
+  //                                   SchedulePage(myEventList[index])));
+  //                     },
+  //                     child: Card(
+  //                       margin: const EdgeInsets.symmetric(vertical: 12),
+  //                       elevation: 4,
+  //                       color: color.secondaryLightColor,
+  //                       shape: RoundedRectangleBorder(
+  //                           borderRadius:
+  //                               BorderRadius.all(Radius.circular(24))),
+  //                       child: Padding(
+  //                         padding: const EdgeInsets.all(12.0),
+  //                         child: Row(
+  //                           children: <Widget>[
+  //                             Container(
+  //                               width: 200,
+  //                               child: Text(myEventList[index].name,
+  //                                   overflow: TextOverflow.ellipsis,
+  //                                   textWidthBasis: TextWidthBasis.parent,
+  //                                   style: TextStyle(
+  //                                       color: Colors.deepPurple,
+  //                                       fontSize: 18,
+  //                                       fontWeight: FontWeight.bold)),
+  //                             ),
+  //                             SizedBox(
+  //                               width: 15,
+  //                             ),
+  //                             Text(
+  //                               DateFormat('E hh:mm a')
+  //                                   .format(myEventList[index].time)
+  //                                   .toString(),
+  //                               style: TextStyle(
+  //                                   fontSize: 16,
+  //                                   color: color.secondaryTextColor),
+  //                             )
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   );
+  //                 },
+  //               ));
+
+  //           /*ListView.builder(
+  //               itemCount: snapshot.data.length,
+  //               itemBuilder: (ctx, index) {
+  //                 return Card(
+  //                     margin: const EdgeInsets.symmetric(vertical: 12),
+  //                     elevation: 4,
+  //                     color: Colors.white,
+  //                     shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.all(Radius.circular(24))),
+  //                     child: Padding(
+  //                       padding: const EdgeInsets.all(12.0),
+  //                       child: Row(
+  //                         children: <Widget>[
+  //                           Text(snapshot.data[index].name,
+  //                               style: TextStyle(
+  //                                   color: Colors.deepPurple,
+  //                                   fontSize: 18,
+  //                                   fontWeight: FontWeight.bold)),
+  //                           SizedBox(
+  //                             width: 40,
+  //                           ),
+  //                           Text('time')
+  //                         ],
+  //                       ),
+  //                     ));
+  //               },),*/
+  //         }));
+
+  // //return
+  // /*return ListView.builder(
+  //             itemCount: snapshot.data.length,
+  //             itemBuilder: (BuildContext context, int index) {
+  //               return Padding(
+  //                 padding: const EdgeInsets.all(10.0),
+  //                 child: Card(
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Row(
+  //         children: <Widget>[
+  //           Text(snapshot.data[index].name, style: TextStyle(color: Colors.deepPurple, fontSize: 18, fontWeight: FontWeight.bold)),
+  //           SizedBox(width: 40,),
+  //           Text('time')
+  //         ],
+  //       ),
+  //     ),
+  //   ),
+  //               );
+  //             });*/
 }
 
 //yes it is 785 lines of code

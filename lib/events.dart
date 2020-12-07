@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Events {
   final String name;
   final DateTime time;
@@ -8,6 +10,13 @@ class Events {
 
   Events(this.name, this.time, this.index, this.delay, this.body, this.imageUrl);
 
+}
+
+class EventList {
+  final DateTime date;
+  final List<Events> eventList;
+
+  EventList(this.date, this.eventList);
 }
 
 class User {

@@ -37,17 +37,7 @@ exports.sendAnnouncementNotification = functions.firestore.document('/Announceme
     console.log(response);
 });
 
-//let transporter = nodemailer.createTransport({
-// service: "gmail",
-// host: 'smtp.gmail.com',
-// port: 587, // tried enabling and disabling these, but no luck
-// secure: true,
-// auth: {
-//     user: 'utsavpr@gmail.com',
-//     pass: '4utsavmail!'
-// }
 
-//});
 
 function mailConfirm(req, res) {
     function isChecked(val) {
@@ -65,7 +55,7 @@ function mailConfirm(req, res) {
         from: 'Utsav Events Team <no-reply@automailer.utsavsac.org>',
         to: req.body.email,
         cc: 'utsavpr@gmail.com',
-        subject: 'Confirmation for Durga Puja Registration #' + Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString(),
+        subject: 'Confirmation for 2020 Bijoya Registration #' + Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString(),
         html: `
         <body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #f2f3f8;" leftmargin="0">
             <!--100% body table-->
@@ -101,25 +91,23 @@ function mailConfirm(req, res) {
                                             <td style="padding:0 35px;">
                                                 <h1
                                                     style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">
-                                                    Confirmation for Your Registration for Durga Puja 2020 Services</h1>
+                                                    Confirmation for Your Registration: Bijoya Lunch-n-Adda</h1>
                                                 <span
                                                     style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
                                                 <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
-                                                    Date of Service: <b>October 24</b> <br> <br>
-                                                    Venue: <b>Sri Siddhi Vinayaka Temple, <br> 4679 Aldona Ln, Sacramento, CA 95841</b> <br> <br>
+                                                    Date: <b>Nov 8</b> <br> 
+                                                    Time: <b>Food pickup between 1-2pm, Zoom adda from 2.30pm onward. </b><br>
+                                                    Venue:  <b>Zoom - link will be shared few days before event </b> <br><br>
                                                     Name: <b>${req.body.name}</b> <br>
-                                                    Group size: <b>${req.body.members}</b> <br> <br>
-                                                    These are the services you have requested: <br>
+                                                    Total order: <b>${parseInt(req.body.members) + parseInt(req.body.guests)}</b> <br> <br>
                                                     <p style="text-align: start; margin-left: 10vw;">
-                                                        <input type="checkbox" name="" id=""  ${isChecked(req.body.driveby)}>
-                                                        <b>Driveby Darshan</b> <br>
-                                                        <input type="checkbox" name="" id="" onclick="return false;" ${isChecked(req.body.bhog)}> <b>Bhog Pickup</b>
-                                                        <br>
-                                                        <input type="checkbox" name="" id="" onclick="return false;" ${isChecked(req.body.prasad)}>
-                                                        <b>Prasad Pickup</b> <br>
-                                                    </p>
+                                                Family Members: <b>${req.body.members}</b> <br>
+                                                Guests: <b>${req.body.guests}</b> <br>
+                                                Amount Payable: <b>$${parseInt(req.body.guests)*7}</b><br>
+                                                Menu choice: <b>${req.body.menu}</b><br>
+                                            </p>
                                                     <p style="color:#455056; font-size:15px;line-height:24px; margin:0; padding: 10px;">
-                                                    You will recieve another email with more details (time windows) few days before the event. <br> <br>
+                                                    You will recieve another email with more details about food pickup few days before the event. <br> <br>
                                                     If you want to change your requested services, please re-fill the <a style="color: rgb(0, 0, 0); text-decoration: none; font-weight: bold;" href="https://kidsonfilms-python-rules.github.io/DP2020RegWebsite/">Registration Form here.</a> <br><br>
                                                     If you have any questions or issues, please contact us at <a style="color: rgb(0, 0, 0); text-decoration: none; font-weight: bold;" href="mailto:Utsav Events Team <utsavpr@gmail.com>">utsavpr@gmail.com</a>
         
@@ -279,11 +267,10 @@ exports.postRegDetails = functions.https.onRequest(async (req, res) => {
         var userObject = {
             name: req.body.name,
             email: req.body.email,
-            driveby: req.body.driveby,
             members: req.body.members,
-            prasad: req.body.prasad,
+            guests: req.body.guests,
             zipcode: req.body.zipcode,
-            bhog: req.body.bhog
+            menu: req.body.menu,
         };
 
         return admin.firestore().doc('bhogReg/' + req.body.email).set(userObject);
